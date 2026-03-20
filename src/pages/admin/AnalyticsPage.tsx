@@ -7,8 +7,7 @@ import { fetchTaskStats } from '@/services/taskService';
 import { useAuth } from '@/contexts/AuthContext';
 import { StatusBadge } from '@/components/StatusBadge';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { CheckCircle2, XCircle, Image, MapPin, FileText, Star } from 'lucide-react';
 import { toast } from 'sonner';
