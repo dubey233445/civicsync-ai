@@ -264,10 +264,10 @@ export default function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
-                      <PriorityBadge priority={task.priority} />
+                      <PriorityBadge priority={task.priority as 'low' | 'medium' | 'high' | 'critical'} />
                     </td>
                     <td className="px-5 py-3.5">
-                      <StatusBadge status={task.status} />
+                      <StatusBadge status={task.status as 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled'} />
                     </td>
                     <td className="px-5 py-3.5">
                       {task.assigned_to ? (
