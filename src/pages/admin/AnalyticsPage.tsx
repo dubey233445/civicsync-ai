@@ -249,5 +249,4 @@ export default function AnalyticsPage() {
   );
 }
 
-// Need CartesianGrid import
-import { CartesianGrid } from 'recharts';
+
