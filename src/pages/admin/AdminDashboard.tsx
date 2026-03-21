@@ -1,13 +1,11 @@
 // Admin Dashboard — KPI cards, task stats, worker leaderboard, activity table
 
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTaskStats, fetchTasks } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
 import { KpiCard } from '@/components/KpiCard';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
 import { CivicMap } from '@/components/CivicMap';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Users, CheckCircle2, MapPin, Star,
   ClipboardList, TrendingUp, Clock, Zap,
