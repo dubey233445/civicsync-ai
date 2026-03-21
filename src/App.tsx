@@ -41,6 +41,7 @@ const App = () => (
               <Route index element={<AdminDashboard />} />
               <Route path="workers" element={<WorkersPage />} />
               <Route path="tasks" element={<TasksPage />} />
+              <Route path="tasks/new" element={<TaskCreatePage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
               <Route path="settings" element={<AnalyticsPage />} />
             </Route>
