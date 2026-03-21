@@ -240,8 +240,7 @@ export default function AdminDashboard() {
         <CivicMap
           tasks={allTasks}
           workers={workers}
-          className="w-full rounded-b-xl"
-          style={{ height: '420px' } as React.CSSProperties}
+          className="w-full rounded-b-xl h-[420px]"
         />
       </div>
 
