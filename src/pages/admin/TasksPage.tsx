@@ -42,6 +42,7 @@ const PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 export default function TasksPage() {
   const { profile }  = useAuth();
   const qc           = useQueryClient();
+  const navigate     = useNavigate();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [createOpen, setCreateOpen] = useState(false);
