@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { fetchTasks, deleteTask } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
 import { rankWorkersForTask } from '@/services/aiAssignment';
@@ -12,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Plus, Search, MapPin, Zap, Star, ChevronRight,
-  Loader2, X, ClipboardList, Trash2, CheckCircle2,
+  Loader2, X, ClipboardList, Trash2, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +42,7 @@ const PRIORITIES = ['low', 'medium', 'high', 'critical'] as const;
 export default function TasksPage() {
   const { profile }  = useAuth();
   const qc           = useQueryClient();
+  const navigate     = useNavigate();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [createOpen, setCreateOpen] = useState(false);
@@ -446,8 +448,15 @@ export default function TasksPage() {
                     <td className="px-5 py-3.5 text-xs text-muted-foreground whitespace-nowrap">
                       {task.due_date ? new Date(task.due_date).toLocaleDateString() : '—'}
                     </td>
-                    <td className="px-5 py-3.5">
+                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => navigate(`/admin/tasks/${task.id}`)}
+                          title="View details"
+                          className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
                         {task.status === 'pending' && (
                           <button
                             onClick={() => handleAutoAssign(task.id)}
