@@ -59,21 +59,19 @@ export default function AdminDashboard() {
     queryFn: fetchWorkers,
   });
 
-  // Recent tasks
-  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
-  useEffect(() => {
-    supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(6)
-      .then(({ data }) => setRecentTasks(data ?? []));
-  }, []);
+  const { data: allTasks = [] } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: fetchTasks,
+    refetchInterval: 30_000,
+  });
+
+  // Recent tasks (latest 6)
+  const recentTasks = allTasks.slice(0, 6);
 
   // Build worker profiles map for assignee names
   const workerMap = Object.fromEntries(workers.map(w => [w.id, w]));
 
-  const topWorkers = [...workers].sort((a, b) => b.performance_score - a.performance_score).slice(0, 5);
+  const topWorkers = [...workers].sort((a, b) => (b.performance_score ?? 0) - (a.performance_score ?? 0)).slice(0, 5);
 
   return (
     <div className="space-y-6">
