@@ -213,6 +213,38 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Interactive Map */}
+      <div className="card-surface shadow-card animate-fade-up delay-600">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Field Map</h2>
+            <p className="text-xs text-muted-foreground">
+              Task pins by status · worker locations (◆)
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {[
+              { color: '#F59E0B', label: 'Pending' },
+              { color: '#3B82F6', label: 'Assigned' },
+              { color: '#8B5CF6', label: 'In Progress' },
+              { color: '#10B981', label: 'Completed' },
+              { color: '#0EA5E9', label: 'Workers ◆' },
+            ].map(({ color, label }) => (
+              <span key={label} className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+        <CivicMap
+          tasks={allTasks}
+          workers={workers}
+          className="w-full rounded-b-xl"
+          style={{ height: '420px' } as React.CSSProperties}
+        />
+      </div>
+
       {/* Recent tasks table */}
       <div className="card-surface shadow-card animate-fade-up delay-600">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
