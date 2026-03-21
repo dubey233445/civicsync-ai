@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { fetchTasks, deleteTask } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
 import { rankWorkersForTask } from '@/services/aiAssignment';
@@ -12,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Plus, Search, MapPin, Zap, Star, ChevronRight,
-  Loader2, X, ClipboardList, Trash2, CheckCircle2,
+  Loader2, X, ClipboardList, Trash2, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
