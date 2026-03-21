@@ -1,20 +1,21 @@
 // Standalone task creation page at /admin/tasks/new
-// Mirrors the dialog form in TasksPage but as a full page
+// Full form + click-to-place map picker + AI assignment panel
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTask } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
 import { rankWorkersForTask } from '@/services/aiAssignment';
 import { useAuth } from '@/contexts/AuthContext';
+import { LocationPicker } from '@/components/LocationPicker';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Zap, Loader2, ChevronRight, MapPin, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Zap, Loader2, ChevronRight, MapPin, ClipboardList, MousePointerClick } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -30,8 +31,8 @@ const CATEGORIES = ['general', 'infrastructure', 'sanitation', 'safety', 'utilit
 const PRIORITIES  = ['low', 'medium', 'high', 'critical'] as const;
 
 export default function TaskCreatePage() {
-  const navigate  = useNavigate();
-  const qc        = useQueryClient();
+  const navigate    = useNavigate();
+  const qc          = useQueryClient();
   const { profile } = useAuth();
 
   const [form, setForm] = useState({
@@ -49,9 +50,20 @@ export default function TaskCreatePage() {
     queryFn: fetchWorkers,
   });
 
+  // Called by LocationPicker when user clicks/drags on map
+  const handleMapPick = useCallback(({ lat, lng }: { lat: number; lng: number }) => {
+    setForm(prev => ({
+      ...prev,
+      latitude:  lat.toFixed(6),
+      longitude: lng.toFixed(6),
+    }));
+    // Clear stale AI scores when location changes
+    setAiScores([]);
+  }, []);
+
   const handleGetAiScores = async () => {
     if (!form.latitude || !form.longitude) {
-      toast.error('Enter latitude and longitude first'); return;
+      toast.error('Pick a location on the map first'); return;
     }
     setAiLoading(true);
     const task = { latitude: parseFloat(form.latitude), longitude: parseFloat(form.longitude) };
@@ -89,8 +101,12 @@ export default function TaskCreatePage() {
   const f = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm(prev => ({ ...prev, [key]: e.target.value }));
 
+  const parsedLat = parseFloat(form.latitude);
+  const parsedLng = parseFloat(form.longitude);
+  const hasCoords = !isNaN(parsedLat) && !isNaN(parsedLng) && form.latitude !== '' && form.longitude !== '';
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 animate-fade-up">
         <button
@@ -103,13 +119,16 @@ export default function TaskCreatePage() {
           <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
             <ClipboardList className="w-5 h-5 text-primary" /> Create New Task
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Fill in task details and optionally AI-assign a worker</p>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Fill in task details · click the map to pin a location · AI-assign a worker
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* ── Task form (3 cols) ── */}
-        <div className="lg:col-span-3 card-surface p-6 shadow-card space-y-5 animate-fade-up delay-100">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {/* ── Column 1: Task form ── */}
+        <div className="card-surface p-6 shadow-card space-y-5 animate-fade-up delay-100">
           <h2 className="text-sm font-semibold text-foreground">Task Details</h2>
 
           <div className="space-y-1.5">
@@ -125,8 +144,8 @@ export default function TaskCreatePage() {
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">Description</Label>
             <Textarea
               value={form.description} onChange={f('description')}
-              placeholder="Detailed task description..."
-              rows={4}
+              placeholder="Detailed task description…"
+              rows={3}
               className="bg-surface-2 border-border focus:border-primary/50 resize-none"
             />
           </div>
@@ -143,20 +162,29 @@ export default function TaskCreatePage() {
             </div>
           </div>
 
+          {/* Coordinate read-outs (editable but also filled by map click) */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Latitude *</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Latitude</Label>
               <Input
-                value={form.latitude} onChange={f('latitude')}
-                placeholder="40.7128"
+                value={form.latitude}
+                onChange={e => {
+                  setForm(p => ({ ...p, latitude: e.target.value }));
+                  setAiScores([]);
+                }}
+                placeholder="click map ↓"
                 className="bg-surface-2 border-border focus:border-primary/50 font-mono text-sm"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Longitude *</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Longitude</Label>
               <Input
-                value={form.longitude} onChange={f('longitude')}
-                placeholder="-74.0060"
+                value={form.longitude}
+                onChange={e => {
+                  setForm(p => ({ ...p, longitude: e.target.value }));
+                  setAiScores([]);
+                }}
+                placeholder="click map ↓"
                 className="bg-surface-2 border-border focus:border-primary/50 font-mono text-sm"
               />
             </div>
@@ -196,7 +224,7 @@ export default function TaskCreatePage() {
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-1">
             <Button
               variant="outline"
               className="flex-1 border-border text-foreground hover:bg-surface-2"
@@ -206,7 +234,7 @@ export default function TaskCreatePage() {
             </Button>
             <Button
               onClick={() => createMutation.mutate(undefined)}
-              disabled={!form.title || !form.latitude || createMutation.isPending}
+              disabled={!form.title || !hasCoords || createMutation.isPending}
               variant="outline"
               className="flex-1 border-border text-foreground hover:bg-surface-2"
             >
@@ -215,8 +243,36 @@ export default function TaskCreatePage() {
           </div>
         </div>
 
-        {/* ── AI panel (2 cols) ── */}
-        <div className="lg:col-span-2 space-y-4 animate-fade-up delay-200">
+        {/* ── Column 2: Map picker ── */}
+        <div className="space-y-3 animate-fade-up delay-150">
+          <div className="card-surface shadow-card overflow-hidden">
+            <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+              <MousePointerClick className="w-3.5 h-3.5 text-primary" />
+              <span className="text-sm font-medium text-foreground">Click to Pin Location</span>
+              {hasCoords && (
+                <span className="ml-auto text-xs font-mono text-muted-foreground">
+                  {parsedLat.toFixed(4)}, {parsedLng.toFixed(4)}
+                </span>
+              )}
+            </div>
+            <LocationPicker
+              lat={hasCoords ? parsedLat : undefined}
+              lng={hasCoords ? parsedLng : undefined}
+              onChange={handleMapPick}
+              className="w-full h-[380px]"
+            />
+          </div>
+
+          {!hasCoords && (
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-1">
+              <MousePointerClick className="w-3 h-3" />
+              Click anywhere on the map to set coordinates · drag pin to adjust
+            </p>
+          )}
+        </div>
+
+        {/* ── Column 3: AI Assignment ── */}
+        <div className="space-y-4 animate-fade-up delay-200">
           <div className="card-surface p-5 shadow-card space-y-4">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-primary" />
@@ -224,17 +280,20 @@ export default function TaskCreatePage() {
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Score = (0.5 × performance) − (0.3 × distance_km)<br />
-              Workers are ranked by proximity and past performance.
+              Workers ranked by proximity and past performance.
             </p>
 
             <Button
               onClick={handleGetAiScores}
-              disabled={aiLoading || !form.latitude || !form.longitude}
+              disabled={aiLoading || !hasCoords}
               size="sm"
               className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
               variant="outline"
             >
-              {aiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Zap className="w-3.5 h-3.5 mr-1.5" />}
+              {aiLoading
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                : <Zap className="w-3.5 h-3.5 mr-1.5" />
+              }
               Compute AI Scores
             </Button>
 
@@ -246,9 +305,7 @@ export default function TaskCreatePage() {
                     key={ws.worker.id}
                     className="w-full flex items-center gap-2 p-2.5 rounded-lg bg-surface-2 border border-border hover:border-primary/40 transition-colors group text-left"
                     onClick={() => {
-                      if (!form.title || !form.latitude) {
-                        toast.error('Fill in title and coordinates first'); return;
-                      }
+                      if (!form.title) { toast.error('Enter a title first'); return; }
                       createMutation.mutate(ws.worker.id);
                     }}
                   >
@@ -264,15 +321,13 @@ export default function TaskCreatePage() {
                       <p className="text-xs font-bold text-primary font-mono">{ws.score.toFixed(2)}</p>
                       <p className="text-xs text-muted-foreground">score</p>
                     </div>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-primary flex-shrink-0" />
                   </button>
                 ))}
 
                 <Button
                   onClick={() => {
-                    if (!form.title || !form.latitude) {
-                      toast.error('Fill in title and coordinates first'); return;
-                    }
+                    if (!form.title) { toast.error('Enter a title first'); return; }
                     createMutation.mutate(aiScores[0]?.worker.id);
                   }}
                   disabled={createMutation.isPending}
@@ -281,17 +336,25 @@ export default function TaskCreatePage() {
                 >
                   {createMutation.isPending
                     ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                    : <Zap className="w-3.5 h-3.5 mr-1.5" />}
+                    : <Zap className="w-3.5 h-3.5 mr-1.5" />
+                  }
                   Auto-Assign Best Worker
                 </Button>
               </div>
             )}
+
+            {!hasCoords && (
+              <p className="text-xs text-muted-foreground text-center py-2">
+                Pin a location on the map first to enable AI scoring.
+              </p>
+            )}
           </div>
 
-          {/* Quick tip */}
+          {/* Tip card */}
           <div className="card-surface p-4 shadow-card">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              💡 <span className="text-foreground font-medium">Tip:</span> Enter the task coordinates first, then click <em>Compute AI Scores</em> to see ranked workers. Click any worker to create the task and assign it directly.
+              💡 <span className="text-foreground font-medium">Workflow:</span> Click the map to set coordinates →
+              compute AI scores → click a worker or hit <em>Auto-Assign</em> to create and assign in one step.
             </p>
           </div>
         </div>

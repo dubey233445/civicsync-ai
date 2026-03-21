@@ -13,6 +13,7 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import WorkersPage from "@/pages/admin/WorkersPage";
 import TasksPage from "@/pages/admin/TasksPage";
 import TaskCreatePage from "@/pages/admin/TaskCreatePage";
+import TaskDetailPage from "@/pages/admin/TaskDetailPage";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
 import WorkerDashboard from "@/pages/worker/WorkerDashboard";
 import NotFound from "@/pages/NotFound";
