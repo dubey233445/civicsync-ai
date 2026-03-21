@@ -448,8 +448,15 @@ export default function TasksPage() {
                     <td className="px-5 py-3.5 text-xs text-muted-foreground whitespace-nowrap">
                       {task.due_date ? new Date(task.due_date).toLocaleDateString() : '—'}
                     </td>
-                    <td className="px-5 py-3.5">
+                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => navigate(`/admin/tasks/${task.id}`)}
+                          title="View details"
+                          className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
                         {task.status === 'pending' && (
                           <button
                             onClick={() => handleAutoAssign(task.id)}
