@@ -1,13 +1,11 @@
 // Admin Dashboard — KPI cards, task stats, worker leaderboard, activity table
 
-import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTaskStats } from '@/services/taskService';
+import { fetchTaskStats, fetchTasks } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
-import { fetchSubmissions } from '@/services/submissionService';
 import { KpiCard } from '@/components/KpiCard';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
-import { supabase } from '@/integrations/supabase/client';
+import { CivicMap } from '@/components/CivicMap';
 import {
   Users, CheckCircle2, MapPin, Star,
   ClipboardList, TrendingUp, Clock, Zap,
@@ -15,7 +13,7 @@ import {
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, CartesianGrid,
+  CartesianGrid,
 } from 'recharts';
 import type { Database } from '@/integrations/supabase/types';
 import { useNavigate } from 'react-router-dom';
@@ -59,21 +57,19 @@ export default function AdminDashboard() {
     queryFn: fetchWorkers,
   });
 
-  // Recent tasks
-  const [recentTasks, setRecentTasks] = useState<Task[]>([]);
-  useEffect(() => {
-    supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(6)
-      .then(({ data }) => setRecentTasks(data ?? []));
-  }, []);
+  const { data: allTasks = [] } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: fetchTasks,
+    refetchInterval: 30_000,
+  });
+
+  // Recent tasks (latest 6)
+  const recentTasks = allTasks.slice(0, 6);
 
   // Build worker profiles map for assignee names
   const workerMap = Object.fromEntries(workers.map(w => [w.id, w]));
 
-  const topWorkers = [...workers].sort((a, b) => b.performance_score - a.performance_score).slice(0, 5);
+  const topWorkers = [...workers].sort((a, b) => (b.performance_score ?? 0) - (a.performance_score ?? 0)).slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -213,6 +209,37 @@ export default function AdminDashboard() {
             View all workers <ChevronRight className="w-3 h-3" />
           </button>
         </div>
+      </div>
+
+      {/* Interactive Map */}
+      <div className="card-surface shadow-card animate-fade-up delay-600">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Field Map</h2>
+            <p className="text-xs text-muted-foreground">
+              Task pins by status · worker locations (◆)
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            {[
+              { color: '#F59E0B', label: 'Pending' },
+              { color: '#3B82F6', label: 'Assigned' },
+              { color: '#8B5CF6', label: 'In Progress' },
+              { color: '#10B981', label: 'Completed' },
+              { color: '#0EA5E9', label: 'Workers ◆' },
+            ].map(({ color, label }) => (
+              <span key={label} className="flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+        <CivicMap
+          tasks={allTasks}
+          workers={workers}
+          className="w-full rounded-b-xl h-[420px]"
+        />
       </div>
 
       {/* Recent tasks table */}
