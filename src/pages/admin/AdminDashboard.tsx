@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTaskStats } from '@/services/taskService';
+import { fetchTaskStats, fetchTasks } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
-import { fetchSubmissions } from '@/services/submissionService';
 import { KpiCard } from '@/components/KpiCard';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import { CivicMap } from '@/components/CivicMap';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Users, CheckCircle2, MapPin, Star,
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, CartesianGrid,
+  CartesianGrid,
 } from 'recharts';
 import type { Database } from '@/integrations/supabase/types';
 import { useNavigate } from 'react-router-dom';
