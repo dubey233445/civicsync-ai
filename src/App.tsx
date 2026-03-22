@@ -46,7 +46,7 @@ const App = () => (
               <Route path="tasks/new" element={<TaskCreatePage />} />
               <Route path="tasks/:id" element={<TaskDetailPage />} />
               <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="settings" element={<AnalyticsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
             </Route>
 
             {/* Worker routes */}
