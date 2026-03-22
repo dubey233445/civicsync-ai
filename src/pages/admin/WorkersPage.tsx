@@ -28,6 +28,7 @@ export default function WorkersPage() {
   const [inviteRole, setInviteRole]     = useState<'admin' | 'worker'>('worker');
   const [inviteLoading, setInviteLoading] = useState(false);
   const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const { data: allProfiles = [], isLoading } = useQuery({
     queryKey: ['allUsers'],
