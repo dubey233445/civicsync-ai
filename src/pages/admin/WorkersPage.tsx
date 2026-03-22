@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchWorkers, fetchAllUsers } from '@/services/profileService';
-import { StatusBadge } from '@/components/StatusBadge';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Users, Search, Plus, Star, MapPin,
   Shield, User, ChevronRight,
