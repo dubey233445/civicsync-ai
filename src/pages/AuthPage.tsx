@@ -143,32 +143,7 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {/* Role selector — register only */}
-            {tab === 'register' && (
-              <div className="space-y-1.5 animate-fade-in">
-                <Label className="text-sm text-muted-foreground">Role</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { value: 'worker', label: 'Field Worker', icon: User },
-                    { value: 'admin',  label: 'Administrator', icon: Shield },
-                  ].map(({ value, label, icon: Icon }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setRole(value as 'admin' | 'worker')}
-                      className={`flex items-center gap-2 p-3 rounded-lg border text-sm font-medium transition-all duration-200
-                        ${role === value
-                          ? 'border-primary/50 bg-primary/10 text-primary'
-                          : 'border-border bg-surface-2 text-muted-foreground hover:text-foreground hover:border-border/80'
-                        }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Role is always worker for self-registration */}
 
             {/* Error / success messages */}
             {error && (
