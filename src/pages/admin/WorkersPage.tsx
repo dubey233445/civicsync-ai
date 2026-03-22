@@ -153,8 +153,9 @@ export default function WorkersPage() {
           {filtered.map((w, i) => (
             <div
               key={w.id}
-              className="card-surface p-5 shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-up group"
+              className="card-surface p-5 shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-up group cursor-pointer"
               style={{ animationDelay: `${i * 60}ms` }}
+              onClick={() => navigate(`/admin/workers/${w.id}`)}
             >
               {/* Worker header */}
               <div className="flex items-start gap-3 mb-4">
