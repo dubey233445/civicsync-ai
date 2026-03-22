@@ -11,6 +11,7 @@ import AuthPage from "@/pages/AuthPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import WorkersPage from "@/pages/admin/WorkersPage";
+import WorkerDetailPage from "@/pages/admin/WorkerDetailPage";
 import TasksPage from "@/pages/admin/TasksPage";
 import TaskCreatePage from "@/pages/admin/TaskCreatePage";
 import TaskDetailPage from "@/pages/admin/TaskDetailPage";
@@ -42,6 +43,7 @@ const App = () => (
             }>
               <Route index element={<AdminDashboard />} />
               <Route path="workers" element={<WorkersPage />} />
+              <Route path="workers/:id" element={<WorkerDetailPage />} />
               <Route path="tasks" element={<TasksPage />} />
               <Route path="tasks/new" element={<TaskCreatePage />} />
               <Route path="tasks/:id" element={<TaskDetailPage />} />

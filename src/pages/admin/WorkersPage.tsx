@@ -1,14 +1,12 @@
 // Workers management page — list, invite, and view worker performance
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { fetchWorkers, fetchAllUsers } from '@/services/profileService';
-import { StatusBadge } from '@/components/StatusBadge';
-import { supabase } from '@/integrations/supabase/client';
 import {
   Users, Search, Plus, Star, MapPin,
-  CheckCircle2, Clock, TrendingUp, MoreHorizontal,
-  Shield, User,
+  Shield, User, ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +26,7 @@ export default function WorkersPage() {
   const [inviteRole, setInviteRole]     = useState<'admin' | 'worker'>('worker');
   const [inviteLoading, setInviteLoading] = useState(false);
   const { signUp } = useAuth();
+  const navigate = useNavigate();
 
   const { data: allProfiles = [], isLoading } = useQuery({
     queryKey: ['allUsers'],
@@ -152,8 +151,9 @@ export default function WorkersPage() {
           {filtered.map((w, i) => (
             <div
               key={w.id}
-              className="card-surface p-5 shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-up group"
+              className="card-surface p-5 shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-up group cursor-pointer"
               style={{ animationDelay: `${i * 60}ms` }}
+              onClick={() => navigate(`/admin/workers/${w.id}`)}
             >
               {/* Worker header */}
               <div className="flex items-start gap-3 mb-4">
@@ -200,9 +200,12 @@ export default function WorkersPage() {
                 <span className="text-xs text-muted-foreground">
                   Joined {new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </span>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${w.is_active ? 'badge-active' : 'badge-overdue'}`}>
-                  {w.is_active ? 'Active' : 'Inactive'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${w.is_active ? 'badge-active' : 'badge-overdue'}`}>
+                    {w.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
               </div>
             </div>
           ))}
