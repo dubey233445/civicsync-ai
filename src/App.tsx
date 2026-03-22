@@ -11,6 +11,7 @@ import AuthPage from "@/pages/AuthPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import WorkersPage from "@/pages/admin/WorkersPage";
+import WorkerDetailPage from "@/pages/admin/WorkerDetailPage";
 import TasksPage from "@/pages/admin/TasksPage";
 import TaskCreatePage from "@/pages/admin/TaskCreatePage";
 import TaskDetailPage from "@/pages/admin/TaskDetailPage";

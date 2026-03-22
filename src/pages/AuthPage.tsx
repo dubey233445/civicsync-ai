@@ -171,10 +171,12 @@ export default function AuthPage() {
             </Button>
           </form>
 
-          {/* Demo hint */}
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            Register with role = <span className="text-primary font-mono">admin</span> to access the dashboard
-          </p>
+          {/* Info hint */}
+          {tab === 'register' && (
+            <p className="text-center text-xs text-muted-foreground mt-4">
+              New accounts are registered as <span className="text-primary font-mono">field workers</span>. Admins are created by existing administrators.
+            </p>
+          )}
         </div>
       </div>
     </div>
