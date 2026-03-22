@@ -440,7 +440,9 @@ export default function AnalyticsPage() {
                         <span className="text-xs font-bold text-primary">{(worker?.full_name ?? '?').charAt(0)}</span>
                       </div>
                       <span className="text-sm font-medium text-foreground">{worker?.full_name ?? 'Unknown Worker'}</span>
-                      <StatusBadge status={'submitted' as any} className="scale-90" />
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border badge-pending scale-90">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Pending
+                      </span>
                     </div>
                     {sub.notes && <p className="text-xs text-muted-foreground mb-1 line-clamp-2">{sub.notes}</p>}
                     {sub.latitude && (
