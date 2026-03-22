@@ -8,8 +8,7 @@ import { StatusBadge } from '@/components/StatusBadge';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Users, Search, Plus, Star, MapPin,
-  CheckCircle2, Clock, TrendingUp, MoreHorizontal,
-  Shield, User,
+  Shield, User, ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
