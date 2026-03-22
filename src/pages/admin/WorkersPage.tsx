@@ -202,9 +202,12 @@ export default function WorkersPage() {
                 <span className="text-xs text-muted-foreground">
                   Joined {new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </span>
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${w.is_active ? 'badge-active' : 'badge-overdue'}`}>
-                  {w.is_active ? 'Active' : 'Inactive'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${w.is_active ? 'badge-active' : 'badge-overdue'}`}>
+                    {w.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
               </div>
             </div>
           ))}
