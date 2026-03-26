@@ -52,133 +52,189 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background grid-bg">
-      {/* Ambient glow blobs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/5 blur-[100px]" />
-      </div>
-
-      <div className="relative w-full max-w-md mx-auto px-4 animate-fade-up">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center glow-primary">
-              <Zap className="w-5 h-5 text-primary" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-foreground">
-              Civic<span className="text-primary">Sync</span>
-            </span>
-          </div>
-          <p className="text-muted-foreground text-sm">AI-Powered Workforce Management</p>
+    <div className="bg-surface text-on-surface min-h-screen flex flex-col pt-16 pb-12 px-6">
+      <header className="fixed top-0 w-full z-50 bg-[#060d20]/80 backdrop-blur-xl flex items-center justify-center px-6 h-16 left-0">
+        <div className="flex items-center gap-2">
+          <span className="material-symbols-outlined text-primary text-2xl">security</span>
+          <span className="text-xl font-extrabold tracking-tighter text-[#dee5ff] font-headline">CivicSync</span>
         </div>
+      </header>
 
-        {/* Card */}
-        <div className="card-surface p-6 shadow-card">
-          {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-surface-2 rounded-lg mb-6">
-            {(['login', 'register'] as Tab[]).map(t => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); setError(null); setSuccess(null); }}
-                className={`flex-1 py-2 text-sm font-medium rounded-md transition-all duration-200 capitalize
-                  ${tab === t
-                    ? 'bg-primary text-primary-foreground shadow-glow-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                {t === 'login' ? 'Sign In' : 'Create Account'}
-              </button>
-            ))}
+      <main className="flex-grow flex flex-col animate-fade-up pt-8">
+        <section className="mt-8 mb-10 flex flex-col items-center text-center">
+          <div className="relative w-full aspect-square max-w-[280px] mb-8 group">
+            <div className="absolute inset-0 bg-primary/20 blur-[60px] rounded-full"></div>
+            <div className="relative w-full h-full rounded-full border border-outline-variant/20 overflow-hidden bg-surface-container flex items-center justify-center">
+              <span className="absolute material-symbols-outlined text-primary text-6xl opacity-80" style={{ fontVariationSettings: "'FILL' 1" }}>shield_lock</span>
+            </div>
           </div>
+          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-on-surface mb-2 leading-tight font-headline">
+            Welcome <span className="text-primary">Sentinel</span>
+          </h1>
+          <p className="text-on-surface-variant text-base max-w-[280px] font-body">
+            Access the command center for your global workforce logistics.
+          </p>
+        </section>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Full name — register only */}
+        <section className="w-full max-w-md mx-auto">
+          {tab === 'register' && (
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold font-headline text-on-surface">Create an Account</h2>
+              <button onClick={() => { setTab('login'); setError(null); setSuccess(null); }} className="text-sm font-bold text-primary hover:underline">Back to Login</button>
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
             {tab === 'register' && (
-              <div className="space-y-1.5 animate-fade-in">
-                <Label htmlFor="fullName" className="text-sm text-muted-foreground">Full Name</Label>
-                <Input
-                  id="fullName"
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  placeholder="Alexandra Chen"
-                  required
-                  className="bg-surface-2 border-border focus:border-primary/50 focus:ring-primary/20"
-                />
+              <div className="space-y-2 animate-fade-in">
+                <label className="text-xs font-semibold text-on-surface-variant tracking-wider uppercase ml-1 font-label" htmlFor="fullName">
+                  Full Name
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <span className="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors">person</span>
+                  </div>
+                  <input
+                    className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary/40 transition-all outline-none font-body"
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Alexandra Chen"
+                    required
+                  />
+                </div>
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm text-muted-foreground">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@civicorg.gov"
-                required
-                className="bg-surface-2 border-border focus:border-primary/50 focus:ring-primary/20"
-              />
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-on-surface-variant tracking-wider uppercase ml-1 font-label" htmlFor="email">
+                Email
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <span className="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors">alternate_email</span>
+                </div>
+                <input
+                  className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary/40 transition-all outline-none font-body"
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@civicsync.com"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm text-muted-foreground">Password</Label>
-              <div className="relative">
-                <Input
+            <div className="space-y-2">
+              <div className="flex justify-between items-end px-1">
+                <label className="text-xs font-semibold text-on-surface-variant tracking-wider uppercase font-label" htmlFor="password">
+                  Password
+                </label>
+                {tab === 'login' && (
+                  <a className="text-xs text-primary hover:text-primary-fixed-dim transition-colors font-label" href="#">Forgot?</a>
+                )}
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                  <span className="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
+                </div>
+                <input
+                  className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-12 text-on-surface placeholder:text-outline focus:ring-1 focus:ring-primary/40 transition-all outline-none font-body"
                   id="password"
+                  name="password"
                   type={showPw ? 'text' : 'password'}
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="bg-surface-2 border-border focus:border-primary/50 focus:ring-primary/20 pr-10"
                 />
                 <button
+                  className="absolute inset-y-0 right-4 flex items-center text-on-surface-variant hover:text-on-surface"
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <span className="material-symbols-outlined">{showPw ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
             </div>
 
-            {/* Role is always worker for self-registration */}
-
-            {/* Error / success messages */}
             {error && (
-              <div className="badge-overdue border rounded-lg px-3 py-2 text-sm animate-fade-in">
+              <div className="bg-error-container text-on-error-container border border-error/50 rounded-xl px-4 py-3 text-sm animate-fade-in font-body">
                 {error}
               </div>
             )}
             {success && (
-              <div className="badge-active border rounded-lg px-3 py-2 text-sm animate-fade-in">
+              <div className="bg-secondary-container text-on-secondary-container border border-secondary/50 rounded-xl px-4 py-3 text-sm animate-fade-in font-body">
                 {success}
               </div>
             )}
 
-            <Button
+            <button
+              className="w-full primary-gradient text-on-primary font-bold py-4 rounded-xl shadow-[0_8px_16px_-4px_rgba(49,107,243,0.3)] hover:shadow-[0_12px_24px_-4px_rgba(49,107,243,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-8 font-label disabled:opacity-70"
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-glow-primary active:scale-[0.98] transition-all"
             >
               {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
               ) : (
-                <ArrowRight className="w-4 h-4 mr-2" />
+                <>
+                  {tab === 'login' ? 'Sign In' : 'Create Account'}
+                  <span className="material-symbols-outlined text-[20px]">login</span>
+                </>
               )}
-              {tab === 'login' ? 'Sign In' : 'Create Account'}
-            </Button>
+            </button>
           </form>
 
-          {/* Info hint */}
-          {tab === 'register' && (
-            <p className="text-center text-xs text-muted-foreground mt-4">
-              New accounts are registered as <span className="text-primary font-mono">field workers</span>. Admins are created by existing administrators.
-            </p>
+          {tab === 'login' && (
+            <div className="mt-12 text-center">
+              <p className="text-on-surface-variant text-sm font-body">
+                New to the network?
+                <button onClick={() => { setTab('register'); setError(null); setSuccess(null); }} className="text-primary font-bold hover:underline decoration-2 underline-offset-4 ml-1">Create an Account</button>
+              </p>
+            </div>
           )}
+
+          {tab === 'login' && (
+            <section className="mt-12 w-full max-w-md mx-auto">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-[1px] flex-grow bg-outline-variant/20"></div>
+                <span className="text-[10px] font-bold text-outline uppercase tracking-widest font-label">Enterprise Access</span>
+                <div className="h-[1px] flex-grow bg-outline-variant/20"></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <button className="flex items-center justify-center gap-3 bg-surface-container py-3 rounded-xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors font-label">
+                  <span className="material-symbols-outlined text-[20px]">hub</span>
+                  <span className="text-sm font-bold text-on-surface">SSO</span>
+                </button>
+                <button className="flex items-center justify-center gap-3 bg-surface-container py-3 rounded-xl border border-outline-variant/10 hover:bg-surface-container-high transition-colors font-label">
+                  <span className="material-symbols-outlined text-[20px]">fingerprint</span>
+                  <span className="text-sm font-bold text-on-surface">Biometric</span>
+                </button>
+              </div>
+            </section>
+          )}
+        </section>
+      </main>
+
+      <footer className="mt-12 py-8 flex flex-col items-center justify-center gap-4 text-on-surface-variant">
+        <div className="flex items-center gap-6">
+          <a className="text-xs font-semibold flex items-center gap-1 hover:text-on-surface transition-colors font-label" href="#">
+            <span className="material-symbols-outlined text-[16px]">contact_support</span>
+            Support
+          </a>
+          <div className="w-1 h-1 rounded-full bg-outline-variant/40"></div>
+          <a className="text-xs font-semibold flex items-center gap-1 hover:text-on-surface transition-colors font-label" href="#">
+            <span className="material-symbols-outlined text-[16px]">language</span>
+            English
+          </a>
         </div>
-      </div>
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/10">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#90abff]"></span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant font-label">Network Status: Operational</span>
+        </div>
+      </footer>
     </div>
   );
 }

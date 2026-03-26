@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CivicSync Worker Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#690005",
+              "tertiary-container": "#bc4800",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8d90a0",
+              "on-tertiary-fixed-variant": "#7d2d00",
+              "inverse-surface": "#dae2fd",
+              "on-secondary": "#003824",
+              "surface-container-highest": "#2d3449",
+              "on-primary-fixed": "#00174b",
+              "surface-variant": "#2d3449",
+              "on-surface": "#dae2fd",
+              "primary": "#b4c5ff",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-fixed-variant": "#003ea8",
+              "on-tertiary-fixed": "#360f00",
+              "on-surface-variant": "#c3c6d7",
+              "primary-container": "#2563eb",
+              "surface-bright": "#31394d",
+              "inverse-on-surface": "#283044",
+              "on-secondary-container": "#00311f",
+              "primary-fixed-dim": "#b4c5ff",
+              "on-tertiary-container": "#ffede6",
+              "on-tertiary": "#581e00",
+              "surface-container-low": "#131b2e",
+              "error": "#ffb4ab",
+              "on-secondary-fixed": "#002113",
+              "tertiary-fixed-dim": "#ffb596",
+              "inverse-primary": "#0053db",
+              "on-primary-container": "#eeefff",
+              "secondary": "#4edea3",
+              "surface-tint": "#b4c5ff",
+              "on-error-container": "#ffdad6",
+              "surface": "#0b1326",
+              "background": "#0b1326",
+              "on-background": "#dae2fd",
+              "on-primary": "#002a78",
+              "outline-variant": "#434655",
+              "tertiary-fixed": "#ffdbcd",
+              "secondary-fixed-dim": "#4edea3",
+              "surface-container": "#171f33",
+              "surface-container-high": "#222a3d",
+              "surface-dim": "#0b1326",
+              "secondary-container": "#00a572",
+              "tertiary": "#ffb596",
+              "error-container": "#93000a",
+              "primary-fixed": "#dbe1ff",
+              "secondary-fixed": "#6ffbbe"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- Top Navigation Bar -->
+<nav class="bg-[#0b1326]/70 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-500">menu</span>
+<h1 class="text-xl font-black tracking-tighter text-white bg-clip-text bg-gradient-to-r from-blue-500 to-blue-200">CivicSync</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined text-slate-400">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full"></span>
+</div>
+<div class="w-8 h-8 rounded-xl bg-primary-container flex items-center justify-center text-[10px] font-bold">JD</div>
+</div>
+</nav>
+<main class="px-6 py-6 space-y-8">
+<!-- SECTION: Home / Today's Tasks -->
+<section class="space-y-6" id="home-view">
+<div class="flex flex-col gap-1">
+<span class="text-secondary text-[10px] uppercase tracking-widest font-bold">Field Operations</span>
+<h2 class="text-3xl font-extrabold tracking-tight">Today's Tasks</h2>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-4 rounded-xl border border-white/5 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-primary">assignment_turned_in</span>
+<div>
+<div class="text-2xl font-bold">12</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Assigned</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border border-white/5 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-secondary">verified</span>
+<div>
+<div class="text-2xl font-bold text-secondary">08</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Completed</div>
+</div>
+</div>
+</div>
+<!-- Task List -->
+<div class="space-y-4">
+<!-- Task Card 1: Pending -->
+<div class="bg-surface-container p-5 rounded-xl transition-all active:scale-[0.98] border-l-4 border-primary-container">
+<div class="flex justify-between items-start mb-3">
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Substation Inspection</h3>
+<p class="text-sm text-slate-400">Sector 7G • Industrial Zone</p>
+</div>
+<div class="bg-primary/10 text-primary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-tighter border border-primary/20">
+                            Pending
+                        </div>
+</div>
+<div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/5">
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-xs font-medium">Due 14:00</span>
+</div>
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="text-xs font-medium">1.2km away</span>
+</div>
+</div>
+</div>
+<!-- Task Card 2: Completed -->
+<div class="bg-surface-container/50 p-5 rounded-xl opacity-80">
+<div class="flex justify-between items-start mb-3">
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Hydrant Flush</h3>
+<p class="text-sm text-slate-400">Main St • Central District</p>
+</div>
+<div class="bg-secondary-container/20 text-secondary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-tighter border border-secondary/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Completed
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION: Task Detail (Secondary Content) -->
+<section class="space-y-6 pt-4 border-t border-white/5" id="detail-view">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">info</span>
+<span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Task Detail</span>
+</div>
+<div class="rounded-xl overflow-hidden h-48 relative border border-white/10">
+<img class="w-full h-full object-cover grayscale brightness-50 contrast-125" data-alt="Dark stylized map interface with navigation path" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPEUVd_cXPXSWajTKLfivYDos9RxObcQ0A07DyNvr6AFhsZRRW28J9dHPcaWbBnA5rIdKWeORGoPa5YzlDtWndzqtHnE3DvcZ3JVX6P5fdk-xs7PMrSJ1r5vCoXc-HpCN2El0f_62MLmE-WLfXQGIKh7wxfE5C0Q4Xo5hpaPngqZL7yXyv7dCP8Xi04gFt1c2kH-x5P6DL-PQH5PDhNs88Nd5lWaeNxxqTwBX30YVYtJPaD78uMTdDPwgU2mrDXDhW6_kXTuUmkxY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+<div class="glass-panel px-3 py-2 rounded-lg border border-white/10">
+<span class="text-[10px] font-bold block opacity-70">TARGET</span>
+<span class="text-sm font-bold tracking-tight">Main Substation 4B</span>
+</div>
+<button class="bg-primary-container p-3 rounded-xl shadow-lg shadow-primary-container/20 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-white">directions</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="text-2xl font-extrabold tracking-tight">Circuit Level Check</h2>
+<div class="bg-error/10 text-error text-[10px] px-3 py-1 rounded-full font-bold border border-error/20">
+                        High Priority
+                    </div>
+</div>
+<p class="text-slate-300 leading-relaxed text-sm">
+                    Perform a manual thermal inspection of the primary circuit breakers. Record levels and check for signs of oxidation on the grounding wires. Notify control if variance exceeds 5%.
+                </p>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-3 rounded-xl">
+<span class="text-[10px] text-slate-500 uppercase font-bold">Deadline</span>
+<p class="font-bold text-white">Today, 17:30</p>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl">
+<span class="text-[10px] text-slate-500 uppercase font-bold">Reference</span>
+<p class="font-bold text-white">OP-9921-X</p>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION: Submit Proof -->
+<section class="space-y-6 pt-4 border-t border-white/5" id="submit-view">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary text-sm">verified_user</span>
+<span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Submit Proof</span>
+</div>
+<div class="space-y-4">
+<!-- Upload Area -->
+<div class="border-2 border-dashed border-white/10 bg-surface-container-low rounded-xl p-8 flex flex-col items-center justify-center gap-4 text-center cursor-pointer hover:bg-surface-container-high transition-colors group">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">add_a_photo</span>
+</div>
+<div>
+<h4 class="font-bold text-lg">Upload Photo</h4>
+<p class="text-xs text-slate-500 mt-1">Capture field work evidence (Max 10MB)</p>
+</div>
+</div>
+<!-- GPS Capture Simulation -->
+<div class="bg-surface-container p-4 rounded-xl flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div>
+<span class="text-[10px] text-slate-500 uppercase font-bold block leading-none mb-1">Auto GPS Capture</span>
+<p class="text-sm font-bold text-white tracking-tight">37.7749° N, 122.4194° W</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-[10px] font-bold text-secondary uppercase tracking-widest">Live</span>
+</div>
+</div>
+<!-- Notes Input -->
+<div class="space-y-2">
+<label class="text-[10px] text-slate-500 uppercase font-bold ml-1">Work Log Notes</label>
+<textarea class="w-full bg-surface-container-highest border-none rounded-xl p-4 text-sm focus:ring-2 focus:ring-primary-container min-h-[100px] placeholder:text-slate-600" placeholder="Describe findings or issues encountered..."></textarea>
+</div>
+<!-- Submit Action -->
+<button class="w-full bg-gradient-to-r from-primary-container to-[#B4C5FF] py-4 rounded-xl font-bold text-on-primary-container shadow-xl shadow-primary-container/20 flex items-center justify-center gap-2 active:scale-95 transition-all">
+                    Submit Task Proof
+                    <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Navigation Shell: BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#171f33]/80 backdrop-blur-xl rounded-t-[12px] border-t border-white/5 shadow-[0_-8px_24px_rgba(0,0,0,0.5)]">
+<!-- Active Tab: Home -->
+<a class="flex flex-col items-center justify-center text-[#4edea3] bg-[#00a572]/10 rounded-xl px-4 py-1 shadow-[0_0_15px_rgba(0,165,114,0.2)] active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_storage</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Home</span>
+</a>
+<!-- Inactive Tab: Tasks (Details) -->
+<a class="flex flex-col items-center justify-center text-slate-500 opacity-80 hover:text-blue-400 transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Tasks</span>
+</a>
+<!-- Inactive Tab: Submit -->
+<a class="flex flex-col items-center justify-center text-slate-500 opacity-80 hover:text-blue-400 transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">verified</span>
+<span class="font-['Manrope'] text-[10px] uppercase tracking-widest font-bold mt-1">Submit</span>
+</a>
+</nav>
+<!-- FAB Suppression: On Detail/Submit pages we hide, but on Home it helps -->
+<button class="fixed right-6 bottom-28 w-14 h-14 rounded-full bg-primary-container text-white shadow-2xl flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</body></html>

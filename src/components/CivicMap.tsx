@@ -16,18 +16,18 @@ interface CivicMapProps {
 
 // Status → marker colour mapping
 const STATUS_COLORS: Record<string, string> = {
-  pending:     '#F59E0B',  // amber  – needs assignment
-  assigned:    '#3B82F6',  // blue   – waiting for worker
-  in_progress: '#8B5CF6',  // purple – worker on it
-  completed:   '#10B981',  // green  – done
-  cancelled:   '#6B7280',  // grey   – cancelled
+  pending:     '#ffb596',  // amber equivalent
+  assigned:    '#90abff',  // primary
+  in_progress: '#ffb4f4',  // tertiary
+  completed:   '#4edea3',  // secondary/emerald
+  cancelled:   '#6d758c',  // outline/slate
 };
 
 const PRIORITY_RING: Record<string, string> = {
-  critical: '#EF4444',
-  high:     '#F97316',
-  medium:   '#F59E0B',
-  low:      '#6B7280',
+  critical: '#d7383b', // error
+  high:     '#ffb596', // amber equivalent
+  medium:   '#90abff', // primary
+  low:      '#6d758c', // outline/slate
 };
 
 /** Build an SVG circle marker with inner dot + optional ring */
@@ -40,7 +40,7 @@ function makeTaskIcon(status: string, priority: string): L.DivIcon {
     <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
       ${isCrit ? `<circle cx="14" cy="14" r="13" fill="none" stroke="${ring}" stroke-width="2" opacity="0.6"/>` : ''}
       <circle cx="14" cy="14" r="9" fill="${fill}" opacity="0.9"/>
-      <circle cx="14" cy="14" r="4" fill="white" opacity="0.9"/>
+      <circle cx="14" cy="14" r="4" fill="#060d20" opacity="0.9"/>
     </svg>`;
 
   return L.divIcon({
@@ -56,8 +56,8 @@ function makeTaskIcon(status: string, priority: string): L.DivIcon {
 function makeWorkerIcon(): L.DivIcon {
   const svg = `
     <svg width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="11,2 20,11 11,20 2,11" fill="#0EA5E9" opacity="0.9"/>
-      <polygon points="11,6 16,11 11,16 6,11" fill="white" opacity="0.85"/>
+      <polygon points="11,2 20,11 11,20 2,11" fill="#4edea3" opacity="0.9"/>
+      <polygon points="11,6 16,11 11,16 6,11" fill="#060d20" opacity="0.85"/>
     </svg>`;
   return L.divIcon({
     html: svg,
@@ -130,14 +130,14 @@ export function CivicMap({ tasks, workers = [], className = '' }: CivicMapProps)
 
       const statusColor = STATUS_COLORS[task.status] ?? '#6B7280';
       marker.bindPopup(`
-        <div style="font-family:'DM Sans',sans-serif;min-width:180px;background:#1e293b;color:#f1f5f9;border-radius:8px;padding:12px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:4px;color:#f1f5f9">${task.title}</div>
-          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
-            <span style="background:${statusColor}22;color:${statusColor};border:1px solid ${statusColor}55;border-radius:4px;padding:2px 7px;font-size:11px;text-transform:capitalize">${task.status.replace('_',' ')}</span>
-            <span style="color:#94a3b8;font-size:11px;text-transform:capitalize">${task.priority}</span>
+        <div style="font-family:'Manrope',sans-serif;min-width:180px;background:#131b2e;color:#e1e2ec;border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5)">
+          <div style="font-weight:900;font-size:14px;margin-bottom:6px;color:#f1f5f9;letter-spacing:-0.02em;">${task.title}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+            <span style="background:${statusColor}15;color:${statusColor};border:1px solid ${statusColor}30;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;">${task.status.replace('_',' ')}</span>
+            <span style="color:#6d758c;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;">${task.priority}</span>
           </div>
-          ${task.location_name ? `<div style="color:#64748b;font-size:11px">📍 ${task.location_name}</div>` : ''}
-          ${task.category ? `<div style="color:#64748b;font-size:11px;margin-top:2px">🏷 ${task.category}</div>` : ''}
+          ${task.location_name ? `<div style="color:#a8b0c8;font-size:11px;font-family:'Inter',sans-serif;margin-bottom:4px">📍 ${task.location_name}</div>` : ''}
+          ${task.category ? `<div style="color:#6d758c;font-size:10px;font-family:'Inter',sans-serif;">🏷 ${task.category}</div>` : ''}
         </div>
       `, { className: 'civic-popup' });
 
@@ -156,14 +156,14 @@ export function CivicMap({ tasks, workers = [], className = '' }: CivicMapProps)
       });
 
       marker.bindPopup(`
-        <div style="font-family:'DM Sans',sans-serif;min-width:160px;background:#1e293b;color:#f1f5f9;border-radius:8px;padding:12px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:4px;color:#f1f5f9">${worker.full_name}</div>
-          <div style="color:#0EA5E9;font-size:12px;margin-bottom:4px">Worker</div>
-          <div style="display:flex;justify-content:space-between;color:#94a3b8;font-size:11px">
-            <span>Score</span>
-            <span style="color:#f1f5f9;font-weight:600">${(worker.performance_score ?? 7.5).toFixed(1)}/10</span>
+        <div style="font-family:'Manrope',sans-serif;min-width:160px;background:#131b2e;color:#e1e2ec;border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.5)">
+          <div style="font-weight:900;font-size:14px;margin-bottom:4px;color:#f1f5f9">${worker.full_name}</div>
+          <div style="color:#4edea3;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">Field Operative</div>
+          <div style="display:flex;justify-content:space-between;color:#a8b0c8;font-size:11px;font-family:'Inter',sans-serif;">
+            <span>Performance Limit</span>
+            <span style="color:#90abff;font-weight:700;font-family:'ui-monospace',monospace">${(worker.performance_score ?? 7.5).toFixed(1)}/10</span>
           </div>
-          ${worker.region ? `<div style="color:#64748b;font-size:11px;margin-top:4px">📍 ${worker.region}</div>` : ''}
+          ${worker.region ? `<div style="color:#6d758c;font-size:11px;font-family:'Inter',sans-serif;margin-top:6px">📍 ${worker.region}</div>` : ''}
         </div>
       `, { className: 'civic-popup' });
 
@@ -186,28 +186,28 @@ export function CivicMap({ tasks, workers = [], className = '' }: CivicMapProps)
       <style>{`
         .civic-popup .leaflet-popup-content-wrapper {
           background: transparent !important;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
-          border-radius: 8px !important;
+          box-shadow: none !important;
+          border-radius: 0 !important;
           padding: 0 !important;
         }
         .civic-popup .leaflet-popup-content {
           margin: 0 !important;
         }
         .civic-popup .leaflet-popup-tip {
-          background: #1e293b !important;
+          background: #131b2e !important;
         }
         .leaflet-control-zoom {
-          border: 1px solid hsl(220 18% 22%) !important;
+          border: 1px solid rgba(255,255,255,0.05) !important;
           border-radius: 8px !important;
           overflow: hidden;
         }
         .leaflet-control-zoom a {
-          background: hsl(220 18% 14%) !important;
-          color: #94a3b8 !important;
-          border-bottom: 1px solid hsl(220 18% 22%) !important;
+          background: #131b2e !important;
+          color: #a8b0c8 !important;
+          border-bottom: 1px solid rgba(255,255,255,0.05) !important;
         }
         .leaflet-control-zoom a:hover {
-          background: hsl(220 18% 20%) !important;
+          background: rgba(255,255,255,0.05) !important;
           color: #f1f5f9 !important;
         }
       `}</style>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CivicSync Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-tertiary-fixed-variant": "#004c69",
+                "primary": "#b4c5ff",
+                "on-primary-fixed-variant": "#003ea8",
+                "on-tertiary": "#00354a",
+                "tertiary": "#7bd0ff",
+                "surface-container": "#171f33",
+                "on-surface": "#dae2fd",
+                "tertiary-fixed-dim": "#7bd0ff",
+                "tertiary-container": "#00759f",
+                "outline": "#8d90a0",
+                "on-background": "#dae2fd",
+                "error": "#ffb4ab",
+                "secondary-fixed-dim": "#4edea3",
+                "secondary-fixed": "#6ffbbe",
+                "on-error": "#690005",
+                "surface": "#0b1326",
+                "on-surface-variant": "#c3c6d7",
+                "on-secondary-fixed": "#002113",
+                "primary-fixed": "#dbe1ff",
+                "primary-container": "#2563eb",
+                "secondary": "#4edea3",
+                "on-secondary-fixed-variant": "#005236",
+                "on-error-container": "#ffdad6",
+                "surface-container-highest": "#2d3449",
+                "outline-variant": "#434655",
+                "on-primary": "#002a78",
+                "surface-container-lowest": "#060e20",
+                "background": "#0b1326",
+                "on-secondary-container": "#00311f",
+                "on-tertiary-container": "#e1f2ff",
+                "primary-fixed-dim": "#b4c5ff",
+                "on-tertiary-fixed": "#001e2c",
+                "surface-variant": "#2d3449",
+                "surface-tint": "#b4c5ff",
+                "on-primary-fixed": "#00174b",
+                "surface-container-low": "#131b2e",
+                "inverse-surface": "#dae2fd",
+                "secondary-container": "#00a572",
+                "on-primary-container": "#eeefff",
+                "surface-container-high": "#222a3d",
+                "surface-bright": "#31394d",
+                "on-secondary": "#003824",
+                "inverse-on-surface": "#283044",
+                "surface-dim": "#0b1326",
+                "inverse-primary": "#0053db",
+                "error-container": "#93000a",
+                "tertiary-fixed": "#c4e7ff"
+              },
+              fontFamily: {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #0b1326; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .tonal-shift-no-border { border: none; }
+        .glass-panel { background: rgba(45, 52, 73, 0.6); backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+<!-- SideNavBar (Shared Component) -->
+<aside class="bg-slate-900 dark:bg-[#131b2e] h-screen w-64 fixed left-0 top-0 flex flex-col py-8 px-6 gap-y-6 z-50 tonal-shift-no-border">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-white dark:text-slate-50 font-headline">CivicSync</h1>
+<p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Executive Control</p>
+</div>
+</div>
+<nav class="flex flex-col gap-y-2 mt-4">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-blue-500 dark:text-[#b4c5ff] font-bold border-r-2 border-blue-500 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200 scale-98-on-click" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium tracking-wide">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 dark:text-[#a1a1aa] hover:text-slate-100 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium tracking-wide">Workers</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 dark:text-[#a1a1aa] hover:text-slate-100 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-sm font-medium tracking-wide">Tasks</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 dark:text-[#a1a1aa] hover:text-slate-100 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-sm font-medium tracking-wide">Analytics</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 dark:text-[#a1a1aa] hover:text-slate-100 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="text-sm font-medium tracking-wide">Messages</span>
+</a>
+<a class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-400 dark:text-[#a1a1aa] hover:text-slate-100 hover:bg-slate-800/50 dark:hover:bg-[#171f33] transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium tracking-wide">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 rounded-xl bg-surface-container-low/50">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-slate-700">
+<img alt="Admin Profile" data-alt="Admin User Profile Avatar Small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkKa0DQgkjlYKE9OAQjU9jLNYzi5Ib0RE_XVDIBmoJBCW4w4pONjDRI-q68sGWsRz28Vd80mrNlaRfUHgrXL0liXWKQ6rJowVx2TcbM_F1o4uh8shbOc-i1k73aAGnBuehERKJf3j-erY791xbISpdUCtkiqJeLxSEljRG0hlLj6DLtgXRgNm9ioO-XblO5g1aKYcgdR_T2L9LEYzZph-5bupMxwbGXx6D20rPKm7VMRKQEBk2LTth7Hkewk4cKuIjxG9P3phGO1E"/>
+</div>
+<div>
+<p class="text-xs font-bold text-slate-200">Julian Voss</p>
+<p class="text-[10px] text-slate-500">System Architect</p>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-container-highest text-slate-300 text-[10px] font-bold uppercase tracking-widest rounded-lg hover:text-white transition-colors">Sign Out</button>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-slate-950/80 dark:bg-[#0b1326]/80 backdrop-blur-xl flex justify-between items-center px-8 z-40 shadow-sm dark:shadow-none tonal-transition-no-border">
+<div class="flex items-center gap-6">
+<h2 class="text-xl font-black text-slate-100 font-headline">CivicSync Admin</h2>
+<div class="relative focus-within:ring-2 focus-within:ring-blue-500/20 rounded-lg">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="bg-surface-container-highest/50 border-none rounded-lg pl-10 pr-4 py-1.5 text-xs text-slate-300 w-64 focus:ring-0" placeholder="Search operational data..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/20 mx-2"></div>
+<button class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+<span class="text-xs font-semibold text-slate-200">Admin Profile</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-base">account_circle</span>
+</div>
+</button>
+</div>
+</header>
+<!-- Canvas Area -->
+<div class="pt-24 pb-12 px-10 max-w-[1600px] mx-auto space-y-12">
+<!-- Row 1: KPI Cards -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-surface-container rounded-xl p-6 shadow-sm flex flex-col justify-between transition-transform hover:scale-[1.01]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest font-label">Total Workers</span>
+<div class="p-2 rounded-lg bg-primary-container/10 text-primary">
+<span class="material-symbols-outlined text-xl">group</span>
+</div>
+</div>
+<div>
+<h3 class="text-3xl font-extrabold text-white font-headline">1,248</h3>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-secondary text-xs font-bold">+4.2%</span>
+<span class="text-on-surface-variant/60 text-[10px]">vs last month</span>
+</div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-container rounded-xl p-6 shadow-sm flex flex-col justify-between transition-transform hover:scale-[1.01]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest font-label">Tasks Completed</span>
+<div class="p-2 rounded-lg bg-secondary/10 text-secondary">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+</div>
+<div>
+<h3 class="text-3xl font-extrabold text-white font-headline">85%</h3>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 mt-4">
+<div class="bg-secondary h-1.5 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.3)]" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-container rounded-xl p-6 shadow-sm flex flex-col justify-between transition-transform hover:scale-[1.01]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest font-label">Active Regions</span>
+<div class="p-2 rounded-lg bg-tertiary-container/10 text-tertiary">
+<span class="material-symbols-outlined text-xl">map</span>
+</div>
+</div>
+<div>
+<h3 class="text-3xl font-extrabold text-white font-headline">12</h3>
+<p class="text-on-surface-variant/60 text-[10px] mt-2">Global distribution active</p>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-container rounded-xl p-6 shadow-sm flex flex-col justify-between transition-transform hover:scale-[1.01]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-widest font-label">Performance Score</span>
+<div class="p-2 rounded-lg bg-primary-container/10 text-primary">
+<span class="material-symbols-outlined text-xl">speed</span>
+</div>
+</div>
+<div>
+<h3 class="text-3xl font-extrabold text-white font-headline">92<span class="text-lg text-slate-500 font-medium">/100</span></h3>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-secondary text-xs font-bold">Optimal Range</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Row 2: Geographic Heatmap -->
+<section class="bg-surface-container rounded-xl overflow-hidden relative group">
+<div class="absolute top-6 left-8 z-10 space-y-1">
+<h4 class="text-xl font-bold text-white font-headline">Global Coverage Heatmap</h4>
+<p class="text-xs text-on-surface-variant">Real-time resource allocation density</p>
+</div>
+<div class="absolute top-6 right-8 z-10 glass-panel p-4 rounded-xl space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.8)]"></div>
+<span class="text-[10px] font-bold text-white uppercase tracking-tighter">High Activity</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="text-[10px] font-bold text-white uppercase tracking-tighter">Normal Coverage</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_rgba(255,180,171,0.5)]"></div>
+<span class="text-[10px] font-bold text-white uppercase tracking-tighter">Needs Attention</span>
+</div>
+</div>
+<div class="h-[480px] w-full bg-surface-container-lowest relative">
+<img alt="Global Heatmap Base" class="w-full h-full object-cover opacity-30 grayscale contrast-125" data-alt="Dark stylized world map visualization for workforce dashboard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4y3N1BrmFrET0Hdag5UVk521-loqp-nOLc7eTEfzYzIhkYgQ8Gx_Gb6NYyxG24zvNa37qn5UAELPQ1CFizSTnEAoRDfEMeiNfHXLyt_9Z_jH_SA89hempMNycBSsimADb1VjjMgevavTwldipef7qIGn65tUIa4Oxwy0exY7Ay5F6PZ0oYB6K0nuQNvG-86x8YhDhK9L37eEu52_aUdpwBAqwgBsLwftapFBEaB0P4fIp3tq4ABSMVhX5tZflsDgO01GX0aJvhCg"/>
+<!-- Faux Heatmap Points -->
+<div class="absolute top-1/3 left-1/4 w-32 h-32 bg-secondary/10 blur-3xl rounded-full"></div>
+<div class="absolute top-1/4 left-1/4 w-4 h-4 bg-secondary rounded-full shadow-[0_0_20px_rgba(78,222,163,1)]"></div>
+<div class="absolute top-1/2 left-1/2 w-48 h-48 bg-primary-container/10 blur-3xl rounded-full"></div>
+<div class="absolute top-1/2 left-1/2 w-4 h-4 bg-primary-container rounded-full shadow-[0_0_20px_rgba(37,99,235,1)]"></div>
+<div class="absolute bottom-1/3 right-1/4 w-40 h-40 bg-error/10 blur-3xl rounded-full"></div>
+<div class="absolute bottom-1/3 right-1/4 w-4 h-4 bg-error rounded-full shadow-[0_0_20px_rgba(255,180,171,1)]"></div>
+</div>
+</section>
+<!-- Row 3: Charts Bento Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+<!-- Left: Task Completion Line Graph -->
+<div class="lg:col-span-3 bg-surface-container rounded-xl p-8 flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="text-lg font-bold text-white font-headline">Task Velocity</h4>
+<p class="text-xs text-on-surface-variant">Daily completion rates vs. target</p>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-surface-container-highest rounded-full text-[10px] text-white font-bold">WEEKLINK</span>
+<span class="px-3 py-1 text-[10px] text-on-surface-variant font-bold hover:text-white transition-colors cursor-pointer">MONTHLY</span>
+</div>
+</div>
+<div class="flex-grow flex items-end gap-2 h-48">
+<!-- Simulated Bar/Line Hybrid Chart -->
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[40%] group-hover:bg-primary-container/40 transition-colors"></div>
+<div class="absolute bottom-[40%] left-0 w-full border-t-2 border-primary"></div>
+</div>
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[65%] group-hover:bg-primary-container/40 transition-colors"></div>
+<div class="absolute bottom-[65%] left-0 w-full border-t-2 border-primary"></div>
+</div>
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[55%] group-hover:bg-primary-container/40 transition-colors"></div>
+<div class="absolute bottom-[55%] left-0 w-full border-t-2 border-primary"></div>
+</div>
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[80%] group-hover:bg-primary-container/40 transition-colors"></div>
+<div class="absolute bottom-[80%] left-0 w-full border-t-2 border-primary"></div>
+</div>
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-secondary/20 rounded-t-lg h-[95%] group-hover:bg-secondary/40 transition-colors"></div>
+<div class="absolute bottom-[95%] left-0 w-full border-t-2 border-secondary"></div>
+</div>
+<div class="flex-grow group relative h-full flex items-end">
+<div class="w-full bg-primary-container/20 rounded-t-lg h-[70%] group-hover:bg-primary-container/40 transition-colors"></div>
+<div class="absolute bottom-[70%] left-0 w-full border-t-2 border-primary"></div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-on-surface-variant font-medium uppercase tracking-widest">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+</div>
+</div>
+<!-- Right: Worker Productivity Bar Chart -->
+<div class="lg:col-span-2 bg-surface-container rounded-xl p-8 flex flex-col">
+<h4 class="text-lg font-bold text-white font-headline mb-6">Top Productivity</h4>
+<div class="space-y-6 flex-grow">
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-tight">
+<span>Sarah Jenkins</span>
+<span class="text-white">9.8</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 98%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-tight">
+<span>Marco Rossi</span>
+<span class="text-white">9.2</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-tight">
+<span>Alina K.</span>
+<span class="text-white">8.9</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 89%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-tight">
+<span>David Chen</span>
+<span class="text-white">8.5</span>
+</div>
+<div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<button class="mt-6 text-[10px] text-primary font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                        View Ranking Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- Row 4: Worker Activity Table -->
+<section class="bg-surface-container rounded-xl overflow-hidden shadow-sm">
+<div class="px-8 py-6 flex justify-between items-center">
+<h4 class="text-lg font-bold text-white font-headline">Live Worker Activity</h4>
+<div class="flex gap-4">
+<button class="bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                        </button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity">
+                            Export CSV
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest text-left">
+<th class="px-8 py-4 bg-surface-container-low font-semibold">Worker Name</th>
+<th class="px-8 py-4 bg-surface-container-low font-semibold">Task</th>
+<th class="px-8 py-4 bg-surface-container-low font-semibold text-center">Status</th>
+<th class="px-8 py-4 bg-surface-container-low font-semibold">Location</th>
+<th class="px-8 py-4 bg-surface-container-low font-semibold text-right">Score</th>
+</tr>
+</thead>
+<tbody class="text-sm font-medium">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">EJ</div>
+<span class="text-slate-200">Elena Jovic</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Public Safety Audit</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Active</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Berlin, DE</td>
+<td class="px-8 py-5 text-right font-bold text-white font-headline">9.8</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">MS</div>
+<span class="text-slate-200">Marcus Smith</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Infrastructure Log</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full bg-tertiary-container/10 text-tertiary text-[10px] font-bold uppercase">Pending</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">London, UK</td>
+<td class="px-8 py-5 text-right font-bold text-white font-headline">7.4</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">LY</div>
+<span class="text-slate-200">Li Yang</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Environmental Scan</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full bg-primary-container/10 text-primary text-[10px] font-bold uppercase">Completed</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Tokyo, JP</td>
+<td class="px-8 py-5 text-right font-bold text-white font-headline">10.0</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-5 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-[10px] font-bold text-primary">AR</div>
+<span class="text-slate-200">Aria Rodriguez</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Sanitation Check</td>
+<td class="px-8 py-5 text-center">
+<span class="px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase">Active</span>
+</td>
+<td class="px-8 py-5 text-on-surface-variant">Madrid, ES</td>
+<td class="px-8 py-5 text-right font-bold text-white font-headline">8.2</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface-container-low flex justify-center">
+<button class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest hover:text-white transition-colors">Load More Records</button>
+</div>
+</section>
+</div>
+</main>
+</body></html>

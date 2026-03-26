@@ -9,20 +9,14 @@ import {
   User, Lock, Settings2, Save, Eye, EyeOff, Loader2,
   ShieldCheck, Sliders, MapPin, CheckCircle2, Bell, Palette,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 type Tab = 'profile' | 'security' | 'app';
 
-const tabs: { id: Tab; label: string; icon: React.ComponentType<any> }[] = [
-  { id: 'profile',  label: 'Profile',       icon: User },
-  { id: 'security', label: 'Security',      icon: Lock },
-  { id: 'app',      label: 'App Settings',  icon: Settings2 },
+const tabs: { id: Tab; label: string; icon: string }[] = [
+  { id: 'profile',  label: 'Operative Profile',       icon: 'account_circle' },
+  { id: 'security', label: 'Security Protocols',      icon: 'lock' },
+  { id: 'app',      label: 'System Configuration',  icon: 'settings_applications' },
 ];
 
 // App settings stored in localStorage for MVP (no backend table needed)
@@ -131,28 +125,29 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-5xl mx-auto animate-fade-in pb-12">
       {/* Header */}
-      <div className="animate-fade-up">
-        <h1 className="text-xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your profile and application preferences</p>
+      <div>
+        <h1 className="text-3xl font-black text-slate-100 font-headline tracking-tight">System Configuration</h1>
+        <p className="font-body text-sm text-on-surface-variant mt-1">
+           Manage operative profile, security protocols, and global system parameters.
+        </p>
       </div>
 
-      <div className="flex gap-6 animate-fade-up delay-100">
+      <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar tabs */}
-        <nav className="w-48 shrink-0 space-y-1">
-          {tabs.map(({ id, label, icon: Icon }) => (
+        <nav className="w-full md:w-64 shrink-0 space-y-1">
+          {tabs.map(({ id, label, icon }) => (
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all ${
                 activeTab === id
-                  ? 'bg-primary/15 text-primary border border-primary/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-surface-2 border border-transparent',
-              )}
+                  ? 'bg-primary border border-primary text-[#0b1326] shadow-[0_0_15px_rgba(144,171,255,0.3)]'
+                  : 'bg-surface-container border border-white/5 text-slate-400 hover:text-slate-200 hover:bg-white/5 hover:border-white/10'
+              }`}
             >
-              <Icon className="w-4 h-4 shrink-0" />
+              <span className="material-symbols-outlined text-[20px]">{icon}</span>
               {label}
             </button>
           ))}
@@ -163,148 +158,169 @@ export default function SettingsPage() {
 
           {/* ── Profile Tab ─────────────────────────────────────────── */}
           {activeTab === 'profile' && (
-            <div className="card-surface p-6 shadow-card space-y-6 animate-fade-up">
-              <div className="flex items-center gap-3 pb-4 border-b border-border">
+            <div className="bg-surface-container border border-white/5 rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
+              
+              <div className="flex items-center gap-4 pb-4 border-b border-white/5 relative z-10">
                 {/* Avatar */}
-                <div className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center">
-                  <span className="text-xl font-bold text-primary">
+                <div className="w-16 h-16 rounded-2xl bg-[#0b1326] border border-primary/30 flex items-center justify-center shadow-lg group hover:border-primary/50 transition-colors cursor-pointer relative overflow-hidden">
+                  <span className="text-2xl font-black text-primary font-headline relative z-10">
                     {profile?.full_name?.charAt(0)?.toUpperCase() ?? 'A'}
                   </span>
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">{profile?.full_name}</p>
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/15 text-primary border border-primary/30">
-                    <ShieldCheck className="w-3 h-3" /> Admin
+                  <h2 className="text-xl font-bold text-slate-200 font-headline">{profile?.full_name}</h2>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 mt-1 rounded text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">
+                    <span className="material-symbols-outlined text-[14px]">admin_panel_settings</span> Executive Clearance
                   </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 relative z-10">
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Full Name</Label>
-                  <Input
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">badge</span> Full Designation
+                  </label>
+                  <input
                     value={profileForm.full_name}
                     onChange={e => setProfileForm(f => ({ ...f, full_name: e.target.value }))}
-                    className="bg-surface-2 border-border focus:border-primary/50"
-                    placeholder="Your full name"
+                    className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder="Enter full designation"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Email</Label>
-                  <Input
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">mail</span> Comm Link (Email)
+                  </label>
+                  <input
                     value={profileForm.email}
                     disabled
-                    className="bg-surface-2 border-border opacity-60 cursor-not-allowed"
+                    className="w-full bg-[#131b2e] border border-white/5 rounded-lg px-4 py-3 text-sm text-slate-500 opacity-60 cursor-not-allowed font-mono tracking-wide"
                     placeholder="your@email.com"
                   />
-                  <p className="text-xs text-muted-foreground">Email cannot be changed here</p>
+                  <p className="text-[10px] text-error font-bold mt-1 uppercase tracking-widest flex items-center gap-1">
+                     <span className="material-symbols-outlined text-[12px]">lock</span> Identity bound configuration.
+                  </p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Phone</Label>
-                  <Input
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">call</span> Secure Line (Phone)
+                  </label>
+                  <input
                     value={profileForm.phone}
                     onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))}
-                    className="bg-surface-2 border-border focus:border-primary/50"
+                    className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-primary/50 transition-colors font-mono tracking-wide"
                     placeholder="+1 (555) 000-0000"
                     type="tel"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-muted-foreground uppercase tracking-wider">Region</Label>
-                  <Input
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">location_on</span> Assigned Zone
+                  </label>
+                  <input
                     value={profileForm.region}
                     onChange={e => setProfileForm(f => ({ ...f, region: e.target.value }))}
-                    className="bg-surface-2 border-border focus:border-primary/50"
-                    placeholder="e.g. Downtown, North District"
+                    className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-primary/50 transition-colors"
+                    placeholder="e.g. Sector 7, Central District"
                   />
                 </div>
               </div>
 
-              <Button
-                onClick={() => profileMutation.mutate()}
-                disabled={profileMutation.isPending || !profileForm.full_name.trim()}
-                className={cn(
-                  'gap-2 transition-all',
-                  profileSaved ? 'bg-secondary hover:bg-secondary/90' : 'bg-primary hover:bg-primary/90',
-                )}
-              >
-                {profileMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : profileSaved ? (
-                  <CheckCircle2 className="w-4 h-4" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                {profileSaved ? 'Saved!' : 'Save Profile'}
-              </Button>
+              <div className="pt-4 border-t border-white/5 flex justify-end relative z-10">
+                <button
+                  onClick={() => profileMutation.mutate()}
+                  disabled={profileMutation.isPending || !profileForm.full_name.trim()}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                    profileSaved 
+                      ? 'bg-secondary text-[#0b1326] border border-secondary shadow-[0_0_15px_rgba(78,222,163,0.3)]' 
+                      : 'bg-primary text-[#0b1326] border border-primary hover:bg-primary/90 shadow-[0_0_15px_rgba(144,171,255,0.3)]'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {profileMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : profileSaved ? (
+                     <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  ) : (
+                     <span className="material-symbols-outlined text-[16px]">save</span>
+                  )}
+                  {profileSaved ? 'Profile Secured!' : 'Commit Changes'}
+                </button>
+              </div>
             </div>
           )}
 
           {/* ── Security Tab ─────────────────────────────────────────── */}
           {activeTab === 'security' && (
-            <div className="card-surface p-6 shadow-card space-y-5 animate-fade-up">
-              <div className="flex items-center gap-2 pb-4 border-b border-border">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center">
-                  <Lock className="w-4 h-4 text-amber-400" />
+            <div className="bg-surface-container border border-white/5 rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-[#ffb596]/5 blur-3xl rounded-full pointer-events-none" />
+              <div className="flex items-center gap-3 pb-4 border-b border-white/5 relative z-10">
+                <div className="w-10 h-10 rounded-xl bg-[#ffb596]/10 border border-[#ffb596]/20 flex items-center justify-center">
+                   <span className="material-symbols-outlined text-[#ffb596]">key</span>
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-foreground">Change Password</h2>
-                  <p className="text-xs text-muted-foreground">Must be at least 8 characters</p>
+                  <h2 className="text-lg font-bold text-slate-200 font-headline">Access Credentials</h2>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Standard cryptographic requirements apply.</p>
                 </div>
               </div>
 
               {/* Current password */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground uppercase tracking-wider">Current Password</Label>
+              <div className="space-y-1.5 relative z-10">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                   <span className="material-symbols-outlined text-[14px]">password</span> Current Passphrase
+                </label>
                 <div className="relative">
-                  <Input
+                  <input
                     type={showCurrent ? 'text' : 'password'}
                     value={passwordForm.currentPassword}
                     onChange={e => setPasswordForm(f => ({ ...f, currentPassword: e.target.value }))}
-                    className="bg-surface-2 border-border focus:border-primary/50 pr-10"
-                    placeholder="Enter current password"
+                    className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#ffb596]/50 transition-colors pr-10 font-mono tracking-widest"
+                    placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrent(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
                   >
-                    {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                     <span className="material-symbols-outlined text-[20px]">{showCurrent ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
               </div>
 
               {/* New password */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground uppercase tracking-wider">New Password</Label>
+              <div className="space-y-1.5 relative z-10">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                   <span className="material-symbols-outlined text-[14px]">vpn_key</span> New Passphrase
+                </label>
                 <div className="relative">
-                  <Input
+                  <input
                     type={showNew ? 'text' : 'password'}
                     value={passwordForm.newPassword}
                     onChange={e => setPasswordForm(f => ({ ...f, newPassword: e.target.value }))}
-                    className="bg-surface-2 border-border focus:border-primary/50 pr-10"
-                    placeholder="Enter new password"
+                    className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#ffb596]/50 transition-colors pr-10 font-mono tracking-widest"
+                    placeholder="Minimum 8 characters"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNew(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
                   >
-                    {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                     <span className="material-symbols-outlined text-[20px]">{showNew ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
                 {/* Strength indicator */}
                 {passwordForm.newPassword.length > 0 && (
-                  <div className="flex gap-1 mt-1">
+                  <div className="flex gap-2 mt-2">
                     {[1,2,3,4].map(i => (
                       <div
                         key={i}
-                        className={cn('h-1 flex-1 rounded-full transition-colors', {
-                          'bg-red-500':    passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length < 6,
-                          'bg-amber-500':  passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length >= 6 && passwordForm.newPassword.length < 10,
-                          'bg-secondary':  passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length >= 10,
-                          'bg-surface-3':  passwordForm.newPassword.length < i * 2,
-                        })}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length < 6 ? 'bg-error shadow-[0_0_5px_currentColor]' :
+                          passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length >= 6 && passwordForm.newPassword.length < 10 ? 'bg-[#ffb596] shadow-[0_0_5px_currentColor]' :
+                          passwordForm.newPassword.length >= i * 2 && passwordForm.newPassword.length >= 10 ? 'bg-secondary shadow-[0_0_5px_currentColor]' :
+                          'bg-white/10'
+                        }`}
                       />
                     ))}
                   </div>
@@ -312,193 +328,204 @@ export default function SettingsPage() {
               </div>
 
               {/* Confirm password */}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground uppercase tracking-wider">Confirm New Password</Label>
+              <div className="space-y-1.5 relative z-10">
+                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                   <span className="material-symbols-outlined text-[14px]">fact_check</span> Confirm Passphrase
+                </label>
                 <div className="relative">
-                  <Input
+                  <input
                     type={showConfirm ? 'text' : 'password'}
                     value={passwordForm.confirmPassword}
                     onChange={e => setPasswordForm(f => ({ ...f, confirmPassword: e.target.value }))}
-                    className={cn(
-                      'bg-surface-2 border-border focus:border-primary/50 pr-10',
+                    className={`w-full bg-[#131b2e] border rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#ffb596]/50 transition-colors pr-10 font-mono tracking-widest ${
                       passwordForm.confirmPassword && passwordForm.confirmPassword !== passwordForm.newPassword
-                        ? 'border-destructive/50'
-                        : '',
-                    )}
-                    placeholder="Confirm new password"
+                        ? 'border-error/50 focus:border-error/50 shadow-[0_0_5px_rgba(215,56,59,0.2)]'
+                        : 'border-white/10'
+                    }`}
+                    placeholder="Re-enter new passphrase"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirm(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
                   >
-                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                     <span className="material-symbols-outlined text-[20px]">{showConfirm ? 'visibility_off' : 'visibility'}</span>
                   </button>
                 </div>
                 {passwordForm.confirmPassword && passwordForm.confirmPassword !== passwordForm.newPassword && (
-                  <p className="text-xs text-destructive">Passwords do not match</p>
+                  <p className="text-[10px] text-error uppercase font-bold tracking-widest mt-1 flex items-center gap-1">
+                     <span className="material-symbols-outlined text-[12px]">warning</span> Passwords do not match
+                  </p>
                 )}
               </div>
 
-              <Button
-                onClick={() => passwordMutation.mutate()}
-                disabled={
-                  passwordMutation.isPending ||
-                  !passwordForm.currentPassword ||
-                  !passwordForm.newPassword ||
-                  !passwordForm.confirmPassword ||
-                  passwordForm.newPassword !== passwordForm.confirmPassword
-                }
-                className={cn(
-                  'gap-2 transition-all',
-                  passwordSaved ? 'bg-secondary hover:bg-secondary/90' : 'bg-primary hover:bg-primary/90',
-                )}
-              >
-                {passwordMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : passwordSaved ? (
-                  <CheckCircle2 className="w-4 h-4" />
-                ) : (
-                  <Lock className="w-4 h-4" />
-                )}
-                {passwordSaved ? 'Password Changed!' : 'Change Password'}
-              </Button>
+              <div className="pt-4 border-t border-white/5 flex justify-end relative z-10">
+                 <button
+                   onClick={() => passwordMutation.mutate()}
+                   disabled={
+                     passwordMutation.isPending ||
+                     !passwordForm.currentPassword ||
+                     !passwordForm.newPassword ||
+                     !passwordForm.confirmPassword ||
+                     passwordForm.newPassword !== passwordForm.confirmPassword
+                   }
+                   className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                     passwordSaved 
+                       ? 'bg-secondary text-[#0b1326] border border-secondary shadow-[0_0_15px_rgba(78,222,163,0.3)]' 
+                       : 'bg-[#ffb596]/10 text-[#ffb596] border border-[#ffb596]/20 hover:bg-[#ffb596]/20 shadow-[0_0_15px_rgba(255,181,150,0.1)]'
+                   } disabled:opacity-50 disabled:cursor-not-allowed`}
+                 >
+                   {passwordMutation.isPending ? (
+                     <Loader2 className="w-4 h-4 animate-spin" />
+                   ) : passwordSaved ? (
+                      <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                   ) : (
+                      <span className="material-symbols-outlined text-[16px]">lock_reset</span>
+                   )}
+                   {passwordSaved ? 'Credentials Updated!' : 'Rotate Credentials'}
+                 </button>
+              </div>
             </div>
           )}
 
           {/* ── App Settings Tab ─────────────────────────────────────── */}
           {activeTab === 'app' && (
-            <div className="card-surface p-6 shadow-card space-y-6 animate-fade-up">
-              <div className="flex items-center gap-2 pb-4 border-b border-border">
-                <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-                  <Sliders className="w-4 h-4 text-primary" />
+            <div className="bg-surface-container border border-white/5 rounded-2xl p-6 shadow-xl space-y-6 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-tertiary/5 blur-3xl rounded-full pointer-events-none" />
+              <div className="flex items-center gap-3 pb-4 border-b border-white/5 relative z-10">
+                <div className="w-10 h-10 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center">
+                   <span className="material-symbols-outlined text-tertiary">tune</span>
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-foreground">Application Settings</h2>
-                  <p className="text-xs text-muted-foreground">Configure defaults for task management</p>
+                  <h2 className="text-lg font-bold text-slate-200 font-headline">Global Parameters</h2>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">System-wide operational behavior overrides.</p>
                 </div>
               </div>
 
               {/* Task Assignment */}
-              <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5" /> Task Assignment
+              <div className="space-y-4 relative z-10">
+                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2 bg-[#131b2e] px-4 py-2 border border-white/5 rounded-lg w-fit">
+                   <span className="material-symbols-outlined text-[16px] text-tertiary">alt_route</span> Task Routing Matrix
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pl-2">
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground uppercase tracking-wider">Default Priority</Label>
-                    <Select
-                      value={appSettings.defaultPriority}
-                      onValueChange={v => setAppSettings(s => ({ ...s, defaultPriority: v }))}
-                    >
-                      <SelectTrigger className="bg-surface-2 border-border">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-surface-1 border-border">
-                        {['low', 'medium', 'high', 'critical'].map(p => (
-                          <SelectItem key={p} value={p} className="capitalize">{p}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[14px]">priority_high</span> Base Line Priority
+                     </label>
+                     <select
+                        value={appSettings.defaultPriority}
+                        onChange={e => setAppSettings(s => ({ ...s, defaultPriority: e.target.value }))}
+                        className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-tertiary/50 transition-colors uppercase tracking-wider font-bold text-[11px]"
+                     >
+                       <option value="low">Low</option>
+                       <option value="medium">Medium</option>
+                       <option value="high">High</option>
+                       <option value="critical">Critical</option>
+                     </select>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground uppercase tracking-wider">
-                      Assignment Radius (km)
-                    </Label>
-                    <Input
+                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[14px]">radar</span> Operational Radius (km)
+                     </label>
+                    <input
                       type="number"
                       min={1}
                       max={200}
                       value={appSettings.assignmentRadiusKm}
                       onChange={e => setAppSettings(s => ({ ...s, assignmentRadiusKm: Number(e.target.value) }))}
-                      className="bg-surface-2 border-border focus:border-primary/50 font-mono-data"
+                      className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-tertiary/50 transition-colors font-mono tracking-widest"
                     />
-                    <p className="text-xs text-muted-foreground">Workers beyond this distance are deprioritized</p>
+                    <p className="text-[10px] text-slate-500 font-bold tracking-wide">Assets outside range receive deprioritization.</p>
                   </div>
                 </div>
 
                 {/* Auto-assign toggle */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Settings2 className="w-4 h-4 text-primary" />
+                <div className="flex items-center justify-between p-4 rounded-xl bg-[#0b1326] border border-white/5 ml-2">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-tertiary/10 border border-tertiary/20 flex items-center justify-center">
+                       <span className="material-symbols-outlined text-tertiary">psychiatry</span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">Auto-Assignment</p>
-                      <p className="text-xs text-muted-foreground">Automatically suggest best worker on task creation</p>
+                      <p className="text-sm font-bold text-slate-200 font-headline">AI Auto-Assignment Protocol</p>
+                      <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">Enable predictive asset matching.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setAppSettings(s => ({ ...s, autoAssignEnabled: !s.autoAssignEnabled }))}
-                    className={cn(
-                      'relative w-11 h-6 rounded-full transition-colors',
-                      appSettings.autoAssignEnabled ? 'bg-primary' : 'bg-surface-3',
-                    )}
+                    className={`relative w-12 h-6 rounded-full transition-colors border ${
+                      appSettings.autoAssignEnabled ? 'bg-tertiary border-tertiary shadow-[0_0_10px_rgba(255,180,244,0.4)]' : 'bg-[#131b2e] border-white/10'
+                    }`}
                   >
-                    <span className={cn(
-                      'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform shadow-sm',
-                      appSettings.autoAssignEnabled ? 'translate-x-5' : 'translate-x-0',
-                    )} />
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${
+                      appSettings.autoAssignEnabled ? 'translate-x-6' : 'translate-x-0 bg-slate-400'
+                    }`} />
                   </button>
                 </div>
               </div>
 
               {/* Notifications */}
-              <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                  <Bell className="w-3.5 h-3.5" /> Notifications
-                </h3>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-border">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                      <Bell className="w-4 h-4 text-amber-400" />
+              <div className="space-y-4 relative z-10">
+                 <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2 bg-[#131b2e] px-4 py-2 border border-white/5 rounded-lg w-fit">
+                   <span className="material-symbols-outlined text-[16px] text-error">campaign</span> Communication Directives
+                 </h3>
+                <div className="flex items-center justify-between p-4 rounded-xl bg-[#0b1326] border border-white/5 ml-2">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-error/10 border border-error/20 flex items-center justify-center">
+                       <span className="material-symbols-outlined text-error">notifications_active</span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">Submission Alerts</p>
-                      <p className="text-xs text-muted-foreground">Get notified when workers submit proof</p>
+                      <p className="text-sm font-bold text-slate-200 font-headline">Real-time Telemetry Alerts</p>
+                      <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">Receive notifications for field proof submissions.</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setAppSettings(s => ({ ...s, notificationsEnabled: !s.notificationsEnabled }))}
-                    className={cn(
-                      'relative w-11 h-6 rounded-full transition-colors',
-                      appSettings.notificationsEnabled ? 'bg-primary' : 'bg-surface-3',
-                    )}
+                    className={`relative w-12 h-6 rounded-full transition-colors border ${
+                      appSettings.notificationsEnabled ? 'bg-error border-error shadow-[0_0_10px_rgba(215,56,59,0.4)]' : 'bg-[#131b2e] border-white/10'
+                    }`}
                   >
-                    <span className={cn(
-                      'absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform shadow-sm',
-                      appSettings.notificationsEnabled ? 'translate-x-5' : 'translate-x-0',
-                    )} />
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${
+                      appSettings.notificationsEnabled ? 'translate-x-6' : 'translate-x-0 bg-slate-400'
+                    }`} />
                   </button>
                 </div>
               </div>
 
               {/* Categories */}
-              <div className="space-y-1.5">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2 mb-2">
-                  <Palette className="w-3.5 h-3.5" /> Task Categories
-                </h3>
-                <Label className="text-xs text-muted-foreground">Comma-separated list of task categories</Label>
-                <Textarea
-                  value={appSettings.taskCategories}
-                  onChange={e => setAppSettings(s => ({ ...s, taskCategories: e.target.value }))}
-                  rows={3}
-                  className="bg-surface-2 border-border focus:border-primary/50 resize-none font-mono-data text-xs"
-                />
+              <div className="space-y-2 relative z-10">
+                 <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2 bg-[#131b2e] px-4 py-2 border border-white/5 rounded-lg w-fit mb-3">
+                   <span className="material-symbols-outlined text-[16px] text-[#ffb596]">category</span> Vector Classification Tags
+                 </h3>
+                 <div className="ml-2 space-y-2">
+                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global taxonomy list (comma delineated):</label>
+                   <textarea
+                     value={appSettings.taskCategories}
+                     onChange={e => setAppSettings(s => ({ ...s, taskCategories: e.target.value }))}
+                     rows={3}
+                     className="w-full bg-[#131b2e] border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-[#ffb596]/50 transition-colors resize-none font-mono tracking-wide leading-relaxed"
+                   />
+                 </div>
               </div>
 
-              <Button
-                onClick={handleSaveApp}
-                className={cn(
-                  'gap-2 transition-all',
-                  appSaved ? 'bg-secondary hover:bg-secondary/90' : 'bg-primary hover:bg-primary/90',
-                )}
-              >
-                {appSaved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-                {appSaved ? 'Settings Saved!' : 'Save Settings'}
-              </Button>
+              <div className="pt-4 border-t border-white/5 flex justify-end relative z-10">
+                <button
+                  onClick={handleSaveApp}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                    appSaved 
+                      ? 'bg-secondary text-[#0b1326] border border-secondary shadow-[0_0_15px_rgba(78,222,163,0.3)]' 
+                      : 'bg-tertiary text-[#0b1326] border border-tertiary hover:bg-tertiary/90 shadow-[0_0_15px_rgba(255,180,244,0.3)]'
+                  }`}
+                >
+                  {appSaved ? (
+                     <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  ) : (
+                     <span className="material-symbols-outlined text-[16px]">save</span>
+                  )}
+                  {appSaved ? 'Parameters Locked' : 'Commit Configuration'}
+                </button>
+              </div>
             </div>
           )}
         </div>

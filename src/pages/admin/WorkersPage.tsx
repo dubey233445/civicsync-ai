@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogTrigger,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -47,7 +47,7 @@ export default function WorkersPage() {
     if (error) {
       toast.error(error.message ?? 'Failed to create user');
     } else {
-      toast.success(`${inviteRole === 'admin' ? 'Admin' : 'Worker'} account created successfully!`);
+      toast.success(`${inviteRole === 'admin' ? 'Executive' : 'Operative'} account provisioned!`);
       setInviteOpen(false);
       setInviteEmail(''); setInviteName(''); setInvitePass('');
     }
@@ -55,156 +55,170 @@ export default function WorkersPage() {
   };
 
   const scoreColor = (score: number) =>
-    score >= 8 ? 'text-emerald-400' : score >= 6 ? 'text-amber-400' : 'text-red-400';
+    score >= 8 ? 'text-primary' : score >= 6 ? 'text-tertiary' : 'text-error';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between animate-fade-up">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Workers</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {workers.length} field workers registered
+          <h1 className="text-3xl font-black text-slate-100 font-headline tracking-tight">Active Operatives</h1>
+          <p className="font-body text-sm text-on-surface-variant mt-1">
+            {workers.length} field operatives globally deployed
           </p>
         </div>
         <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2 bg-primary hover:bg-primary/90 shadow-glow-primary">
-              <Plus className="w-4 h-4" /> Add Worker
+            <Button className="bg-[#2563EB] hover:bg-[#2563EB]/90 text-white font-bold tracking-wide rounded-xl px-6 py-2 h-auto shadow-lg shadow-[#2563EB]/20 transition-all flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">person_add</span> Provision Account
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-surface-1 border-border max-w-sm">
-            <DialogHeader>
-              <DialogTitle className="text-foreground">Create Account</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleInvite} className="space-y-4 mt-2">
-              <div className="space-y-1.5">
-                <Label className="text-sm text-muted-foreground">Full Name</Label>
-                <Input value={inviteName} onChange={e => setInviteName(e.target.value)} placeholder="Marcus Johnson" className="bg-surface-2 border-border focus:border-primary/50" required />
+          <DialogContent className="bg-surface-container-high border-white/5 max-w-md rounded-2xl shadow-2xl p-0 overflow-hidden">
+            <header className="p-6 pb-4 border-b border-white/5 bg-surface-container">
+              <h2 className="font-headline text-xl font-bold text-on-surface">Provision Personnel</h2>
+              <p className="font-body text-xs text-on-surface-variant mt-1">Create an enterprise access account.</p>
+            </header>
+            <form onSubmit={handleInvite} className="p-6 space-y-5">
+              <div className="space-y-2">
+                <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Full Name</label>
+                <input 
+                  className="w-full bg-[#131b2e] border border-white/5 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-slate-200 rounded-xl py-3 px-4 outline-none font-body transition-all placeholder:text-outline" 
+                   value={inviteName} onChange={e => setInviteName(e.target.value)} placeholder="e.g. Marcus Johnson" required 
+                />
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm text-muted-foreground">Email</Label>
-                <Input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="worker@civic.gov" className="bg-surface-2 border-border focus:border-primary/50" required />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm text-muted-foreground">Temporary Password</Label>
-                <Input type="password" value={invitePass} onChange={e => setInvitePass(e.target.value)} placeholder="••••••••" className="bg-surface-2 border-border focus:border-primary/50" required />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm text-muted-foreground">Role</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[{ v: 'worker', l: 'Worker', I: User }, { v: 'admin', l: 'Admin', I: Shield }].map(({ v, l, I }) => (
-                    <button key={v} type="button" onClick={() => setInviteRole(v as any)}
-                      className={`flex items-center gap-2 p-2.5 rounded-lg border text-sm font-medium transition-all
-                        ${inviteRole === v ? 'border-primary/50 bg-primary/10 text-primary' : 'border-border bg-surface-2 text-muted-foreground hover:text-foreground'}`}>
-                      <I className="w-4 h-4" /> {l}
+              <div className="space-y-2">
+                <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Classification (Role)</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[{ v: 'worker', l: 'Field Operative', I: 'badge' }, { v: 'admin', l: 'Executive', I: 'shield' }].map(({ v, l, I }) => (
+                    <button 
+                      key={v} type="button" onClick={() => setInviteRole(v as any)}
+                      className={`flex flex-col items-center justify-center gap-2 py-4 rounded-xl border text-sm font-bold transition-all
+                        ${inviteRole === v ? 'border-primary/50 bg-primary/10 text-primary' : 'border-white/5 bg-[#131b2e] text-slate-400 hover:text-slate-200 hover:border-white/20'}`}>
+                      <span className="material-symbols-outlined">{I}</span> {l}
                     </button>
                   ))}
                 </div>
               </div>
-              <Button type="submit" disabled={inviteLoading} className="w-full bg-primary hover:bg-primary/90">
-                {inviteLoading ? 'Creating...' : 'Create Account'}
-              </Button>
+              <div className="space-y-2">
+                <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Email Address</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[18px]">alternate_email</span>
+                  <input 
+                    type="email"
+                    className="w-full bg-[#131b2e] border border-white/5 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-slate-200 rounded-xl py-3 pl-11 pr-4 outline-none font-body transition-all placeholder:text-outline" 
+                     value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="operative@civicsync.gov" required 
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Temporary Key</label>
+                <div className="relative">
+                   <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[18px]">key</span>
+                  <input 
+                    type="password"
+                    className="w-full bg-[#131b2e] border border-white/5 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 text-slate-200 rounded-xl py-3 pl-11 pr-4 outline-none font-body transition-all placeholder:text-outline tracking-widest" 
+                     value={invitePass} onChange={e => setInvitePass(e.target.value)} placeholder="••••••••" required 
+                  />
+                </div>
+              </div>
+              <div className="pt-2">
+                <button type="submit" disabled={inviteLoading} className="w-full bg-[#2563EB] hover:bg-[#B4C5FF] hover:text-[#00174B] disabled:opacity-50 py-4 rounded-xl text-white font-headline font-black text-sm uppercase tracking-widest shadow-[0_8px_32px_rgba(37,99,235,0.2)] active:scale-95 transition-all">
+                  {inviteLoading ? 'Provisioning...' : 'Provision Access'}
+                </button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm animate-fade-up delay-100">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search workers..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="pl-8 bg-surface-1 border-border focus:border-primary/50"
-        />
+      {/* Control Strip */}
+      <div className="bg-surface-container-low border border-white/5 rounded-2xl p-4 flex flex-wrap gap-4 items-center">
+        <div className="relative w-full max-w-sm">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+          <Input
+            placeholder="Search personnel directory..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-10 bg-surface-container border-none focus-visible:ring-1 focus-visible:ring-primary w-full rounded-xl font-body h-12 text-slate-200 placeholder:text-slate-500"
+          />
+        </div>
       </div>
 
-      {/* Workers grid */}
+      {/* Personnel Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card-surface p-5 shadow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="shimmer w-12 h-12 rounded-full" />
-                <div className="space-y-2 flex-1">
-                  <div className="shimmer h-4 rounded w-3/4" />
-                  <div className="shimmer h-3 rounded w-1/2" />
-                </div>
-              </div>
-              <div className="shimmer h-3 rounded w-full mb-2" />
-              <div className="shimmer h-3 rounded w-2/3" />
+            <div key={i} className="bg-surface-container border border-white/5 rounded-2xl p-6 h-48 animate-pulse">
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="card-surface p-12 text-center animate-fade-up">
-          <Users className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-foreground font-medium">No workers found</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {search ? 'Try a different search term' : 'Add workers to get started'}
+        <div className="bg-surface-container border border-white/5 rounded-2xl p-16 text-center animate-fade-up">
+          <span className="material-symbols-outlined text-5xl text-outline mb-4 opacity-50">person_off</span>
+          <p className="text-slate-200 font-bold mb-1">No Operatives Found</p>
+          <p className="text-sm text-outline">
+            {search ? 'Try adjusting your search parameters.' : 'Provision new accounts to populate the directory.'}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filtered.map((w, i) => (
             <div
               key={w.id}
-              className="card-surface p-5 shadow-card hover:shadow-card-hover transition-all duration-300 animate-fade-up group cursor-pointer"
+              className="bg-surface-container border border-white/5 rounded-2xl p-6 shadow-xl hover:shadow-2xl hover:border-white/10 hover:bg-surface-container-high transition-all duration-300 animate-fade-up group cursor-pointer flex flex-col"
               style={{ animationDelay: `${i * 60}ms` }}
               onClick={() => navigate(`/admin/workers/${w.id}`)}
             >
-              {/* Worker header */}
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg font-bold text-primary">
-                    {w.full_name.charAt(0).toUpperCase()}
-                  </span>
+              {/* Card Header */}
+              <div className="flex items-start gap-4 mb-6">
+                <div className="relative w-14 h-14 rounded-full border-2 border-primary/20 p-0.5 shrink-0 bg-surface">
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-xl font-black text-primary font-headline">
+                      {w.full_name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-surface-container ${w.is_active ? 'bg-secondary shadow-[0_0_8px_#4edea3]' : 'bg-outline'}`} title={w.is_active ? 'Online' : 'Offline'}></div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground text-sm truncate">{w.full_name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{w.email}</p>
-                  {w.region && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <MapPin className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{w.region}</span>
-                    </div>
-                  )}
-                </div>
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full flex-shrink-0 ${w.is_active ? 'bg-emerald-500/15' : 'bg-red-500/15'}`}>
-                  <div className={`w-2 h-2 rounded-full ${w.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                <div className="flex-1 min-w-0 pt-1">
+                  <p className="font-bold text-slate-100 text-lg truncate font-headline">{w.full_name}</p>
+                  <p className="text-xs text-outline truncate font-medium tracking-wide">{w.email}</p>
                 </div>
               </div>
 
-              {/* Performance score */}
-              <div className="mb-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Star className="w-3 h-3" /> Performance
-                  </span>
-                  <span className={`text-sm font-bold font-mono-data tabular-nums ${scoreColor(w.performance_score)}`}>
-                    {w.performance_score.toFixed(1)}/10
-                  </span>
+              {/* Data Rows */}
+              <div className="space-y-4 flex-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-outline uppercase tracking-widest font-bold text-[10px]">Zone</span>
+                  <div className="flex items-center gap-1.5 text-slate-300 font-medium bg-[#131b2e] px-2.5 py-1 rounded border border-white/5">
+                    <span className="material-symbols-outlined text-[14px] text-primary">location_on</span>
+                    <span className="text-xs truncate max-w-[120px]">{w.region || 'Unassigned'}</span>
+                  </div>
                 </div>
-                <div className="w-full bg-surface-3 rounded-full h-1.5">
-                  <div
-                    className="h-1.5 rounded-full score-gradient transition-all duration-500"
-                    style={{ width: `${(w.performance_score / 10) * 100}%` }}
-                  />
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-outline uppercase tracking-widest font-bold text-[10px]">Rating</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${(w.performance_score / 10) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm font-bold font-mono tracking-wider tabular-nums ${scoreColor(w.performance_score)}`}>
+                      {w.performance_score.toFixed(1)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between pt-3 border-t border-border">
-                <span className="text-xs text-muted-foreground">
-                  Joined {new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              <div className="flex items-center justify-between pt-5 mt-4 border-t border-white/5">
+                <span className="text-[10px] uppercase text-outline font-bold tracking-widest">
+                  Auth: {new Date(w.created_at).toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' })}
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${w.is_active ? 'badge-active' : 'badge-overdue'}`}>
-                    {w.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+                <div className="flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                  <span className="text-xs font-bold text-primary">Dossier</span>
+                  <span className="material-symbols-outlined text-[16px] text-primary">arrow_forward</span>
                 </div>
               </div>
             </div>
