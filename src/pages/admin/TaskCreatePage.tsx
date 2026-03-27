@@ -2,7 +2,7 @@
 // Full form + click-to-place map picker + AI assignment panel
 
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTask } from '@/services/taskService';
 import { fetchWorkers } from '@/services/profileService';
@@ -32,6 +32,8 @@ const PRIORITIES  = ['low', 'medium', 'high', 'critical'] as const;
 
 export default function TaskCreatePage() {
   const navigate    = useNavigate();
+  const [searchParams] = useSearchParams();
+  const workerIdParam = searchParams.get('worker_id');
   const qc          = useQueryClient();
   const { profile } = useAuth();
 
@@ -233,12 +235,12 @@ export default function TaskCreatePage() {
               Cancel
             </Button>
             <Button
-              onClick={() => createMutation.mutate(undefined)}
+              onClick={() => createMutation.mutate(workerIdParam || undefined)}
               disabled={!form.title || !hasCoords || createMutation.isPending}
               variant="outline"
-              className="flex-1 border-border text-foreground hover:bg-surface-2"
+              className={`flex-1 border-border transition-colors ${workerIdParam ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/20' : 'text-foreground hover:bg-surface-2'}`}
             >
-              {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save as Pending'}
+              {createMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : (workerIdParam ? 'Save and Assign' : 'Save as Pending')}
             </Button>
           </div>
         </div>
@@ -271,82 +273,125 @@ export default function TaskCreatePage() {
           )}
         </div>
 
-        {/* ── Column 3: AI Assignment ── */}
+        {/* ── Column 3: AI Assignment or Direct Assignment ── */}
         <div className="space-y-4 animate-fade-up delay-200">
           <div className="card-surface p-5 shadow-card space-y-4">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-semibold text-foreground">AI Assignment</h2>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Score = (0.5 × performance) − (0.3 × distance_km)<br />
-              Workers ranked by proximity and past performance.
-            </p>
-
-            <Button
-              onClick={handleGetAiScores}
-              disabled={aiLoading || !hasCoords}
-              size="sm"
-              className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
-              variant="outline"
-            >
-              {aiLoading
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                : <Zap className="w-3.5 h-3.5 mr-1.5" />
-              }
-              Compute AI Scores
-            </Button>
-
-            {aiScores.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Top Workers</p>
-                {aiScores.map((ws, i) => (
-                  <button
-                    key={ws.worker.id}
-                    className="w-full flex items-center gap-2 p-2.5 rounded-lg bg-surface-2 border border-border hover:border-primary/40 transition-colors group text-left"
-                    onClick={() => {
-                      if (!form.title) { toast.error('Enter a title first'); return; }
-                      createMutation.mutate(ws.worker.id);
-                    }}
-                  >
-                    <span className="text-xs font-mono text-muted-foreground w-4 flex-shrink-0">{i + 1}</span>
-                    <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs font-bold text-primary">{ws.worker.full_name.charAt(0)}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-foreground truncate">{ws.worker.full_name}</p>
-                      <p className="text-xs text-muted-foreground">{ws.distanceKm.toFixed(1)} km away</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-xs font-bold text-primary font-mono">{ws.score.toFixed(2)}</p>
-                      <p className="text-xs text-muted-foreground">score</p>
-                    </div>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-primary flex-shrink-0" />
-                  </button>
-                ))}
+            {workerIdParam ? (() => {
+               const preselectedWorker = workers.find(w => w.id === workerIdParam);
+               return (
+                 <div className="space-y-4">
+                   <div className="flex items-center gap-2">
+                     <span className="material-symbols-outlined text-primary text-[20px]">person_add</span>
+                     <h2 className="text-sm font-semibold text-foreground">Direct Assignment</h2>
+                   </div>
+                   <p className="text-xs text-muted-foreground leading-relaxed">
+                     You are creating a task directly assigned to a specific operative.
+                   </p>
+                   {preselectedWorker ? (
+                     <div className="p-3 bg-surface-2 rounded-lg border border-border flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                         <span className="text-primary font-bold">{preselectedWorker.full_name.charAt(0)}</span>
+                       </div>
+                       <div className="flex-1 min-w-0">
+                         <p className="text-sm font-bold text-foreground truncate">{preselectedWorker.full_name}</p>
+                         <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Operative</p>
+                       </div>
+                     </div>
+                   ) : (
+                     <div className="p-3 bg-surface-2 rounded-lg border border-border text-xs text-muted-foreground text-center">
+                       Loading operative details...
+                     </div>
+                   )}
+                   <Button
+                     onClick={() => {
+                       if (!form.title) { toast.error('Enter a title first'); return; }
+                       createMutation.mutate(workerIdParam);
+                     }}
+                     disabled={createMutation.isPending || !form.title || !hasCoords}
+                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow-primary"
+                   >
+                     {createMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <span className="material-symbols-outlined text-[16px] mr-1.5">assignment_ind</span>}
+                     Assign to Operative
+                   </Button>
+                 </div>
+               );
+            })() : (
+              <>
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary" />
+                  <h2 className="text-sm font-semibold text-foreground">AI Assignment</h2>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Score = (0.5 × performance) − (0.3 × distance_km)<br />
+                  Workers ranked by proximity and past performance.
+                </p>
 
                 <Button
-                  onClick={() => {
-                    if (!form.title) { toast.error('Enter a title first'); return; }
-                    createMutation.mutate(aiScores[0]?.worker.id);
-                  }}
-                  disabled={createMutation.isPending}
-                  className="w-full mt-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow-primary"
+                  onClick={handleGetAiScores}
+                  disabled={aiLoading || !hasCoords}
                   size="sm"
+                  className="w-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30"
+                  variant="outline"
                 >
-                  {createMutation.isPending
+                  {aiLoading
                     ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
                     : <Zap className="w-3.5 h-3.5 mr-1.5" />
                   }
-                  Auto-Assign Best Worker
+                  Compute AI Scores
                 </Button>
-              </div>
-            )}
 
-            {!hasCoords && (
-              <p className="text-xs text-muted-foreground text-center py-2">
-                Pin a location on the map first to enable AI scoring.
-              </p>
+                {aiScores.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Top Workers</p>
+                    {aiScores.map((ws, i) => (
+                      <button
+                        key={ws.worker.id}
+                        className="w-full flex items-center gap-2 p-2.5 rounded-lg bg-surface-2 border border-border hover:border-primary/40 transition-colors group text-left"
+                        onClick={() => {
+                          if (!form.title) { toast.error('Enter a title first'); return; }
+                          createMutation.mutate(ws.worker.id);
+                        }}
+                      >
+                        <span className="text-xs font-mono text-muted-foreground w-4 flex-shrink-0">{i + 1}</span>
+                        <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs font-bold text-primary">{ws.worker.full_name.charAt(0)}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-foreground truncate">{ws.worker.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{ws.distanceKm.toFixed(1)} km away</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-xs font-bold text-primary font-mono">{ws.score.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">score</p>
+                        </div>
+                        <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:text-primary flex-shrink-0" />
+                      </button>
+                    ))}
+
+                    <Button
+                      onClick={() => {
+                        if (!form.title) { toast.error('Enter a title first'); return; }
+                        createMutation.mutate(aiScores[0]?.worker.id);
+                      }}
+                      disabled={createMutation.isPending}
+                      className="w-full mt-1 bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow-primary"
+                      size="sm"
+                    >
+                      {createMutation.isPending
+                        ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                        : <Zap className="w-3.5 h-3.5 mr-1.5" />
+                      }
+                      Auto-Assign Best Worker
+                    </Button>
+                  </div>
+                )}
+
+                {!hasCoords && (
+                  <p className="text-xs text-muted-foreground text-center py-2">
+                    Pin a location on the map first to enable AI scoring.
+                  </p>
+                )}
+              </>
             )}
           </div>
 
