@@ -41,10 +41,15 @@ export default function WorkerDashboard() {
         video: { facingMode: 'environment' } 
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
       setShowCamera(true);
+      
+      // Delay assigning the srcObject slightly to allow React to render the video element first
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 50);
+
       // Initiate GPS right when camera opens
       if (!gps) {
         captureGps();
