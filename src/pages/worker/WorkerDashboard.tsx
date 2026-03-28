@@ -1,6 +1,6 @@
 // Worker mobile UI — task list, task detail, and proof submission
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchWorkerTasks } from '@/services/taskService';
 import { createSubmission, uploadProofImage } from '@/services/submissionService';
@@ -20,6 +20,67 @@ export default function WorkerDashboard() {
   const [gps, setGps] = useState<{ lat: number; lon: number } | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'tasks' | 'submit' | 'profile'>('tasks');
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
+  const startCamera = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast.error('Camera API not supported in this browser.');
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setShowCamera(true);
+    } catch (err) {
+      toast.error('Could not access camera. Please allow permissions.');
+      console.error('Camera error:', err);
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
+
+  const takePhoto = () => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+            stopCamera();
+            if (!gps) {
+              captureGps();
+            }
+          }
+        }, 'image/jpeg', 0.8);
+      }
+    }
+  };
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ['workerTasks', profile?.id],
@@ -72,7 +133,9 @@ export default function WorkerDashboard() {
       toast.success('Proof submitted successfully! 🎉');
       qc.invalidateQueries({ queryKey: ['workerTasks'] });
       setSelectedTask(null);
+      setSelectedTask(null);
       setNotes(''); setImageFile(null); setImagePreview(null); setGps(null);
+      stopCamera();
       setActiveTab('tasks');
     },
     onError: (e: Error) => toast.error(e.message),
@@ -120,7 +183,13 @@ export default function WorkerDashboard() {
                   {pendingTasks.map((task) => (
                     <div 
                       key={task.id} 
-                      onClick={() => { setSelectedTask(task); setActiveTab('submit'); }}
+                      onClick={() => { 
+                        setSelectedTask(task); 
+                        setActiveTab('submit');
+                        // Ensure we reset previous submissions UI states when switching tasks
+                        setImageFile(null);
+                        setImagePreview(null);
+                      }}
                       className="group relative overflow-hidden bg-surface-container-low rounded-xl p-5 border border-white/5 transition-all duration-300 hover:bg-surface-container cursor-pointer active:scale-[0.98] w-full block"
                     >
                       <div className="flex justify-between items-start mb-4">
@@ -186,7 +255,10 @@ export default function WorkerDashboard() {
                 <p className="text-slate-200 font-bold mb-2">No Task Selected</p>
                 <p className="text-sm text-outline mb-6">Select a pending task to submit proof.</p>
                 <button 
-                  onClick={() => setActiveTab('tasks')}
+                  onClick={() => {
+                    setActiveTab('tasks');
+                    stopCamera();
+                  }}
                   className="px-6 py-3 rounded-full bg-primary/10 text-primary font-bold text-sm tracking-widest uppercase hover:bg-primary/20 transition-colors w-full active:scale-95"
                 >
                   Go to Tasks
@@ -232,27 +304,67 @@ export default function WorkerDashboard() {
                 </div>
 
                 <div className="space-y-4 w-full">
-                  <label className="block cursor-pointer w-full">
-                    <input type="file" accept="image/*" capture="environment" onChange={handleImageChange} className="sr-only" />
-                    {imagePreview ? (
-                      <div className="relative rounded-xl overflow-hidden border border-border h-48 w-full block">
-                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 flex items-center justify-center bg-background/40 opacity-0 hover:opacity-100 transition-opacity">
-                          <span className="material-symbols-outlined text-4xl text-white">photo_camera</span>
+                  <div className="w-full">
+                    {showCamera ? (
+                      <div className="relative rounded-xl overflow-hidden border border-border h-64 w-full bg-black block flex flex-col">
+                        <video 
+                          ref={videoRef} 
+                          autoPlay 
+                          playsInline 
+                          muted 
+                          className="w-full h-full object-cover"
+                          onCanPlay={() => {
+                            // Ensure the video scales properly when ready
+                            if (videoRef.current && streamRef.current) {
+                              videoRef.current.play().catch(e => console.error("Video play error:", e));
+                            }
+                          }}
+                        />
+                        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                          <button 
+                            onClick={stopCamera}
+                            className="bg-surface/80 backdrop-blur text-foreground px-4 py-2 rounded-full font-bold text-xs"
+                          >
+                            Cancel
+                          </button>
+                          <button 
+                            onClick={takePhoto}
+                            className="bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-sm">camera</span> Snap
+                          </button>
                         </div>
                       </div>
+                    ) : imagePreview ? (
+                      <div className="relative rounded-xl overflow-hidden border border-border h-48 w-full block">
+                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        <button 
+                          onClick={() => {
+                            setImageFile(null);
+                            setImagePreview(null);
+                            startCamera();
+                          }}
+                          className="absolute inset-0 flex items-center justify-center bg-background/60 opacity-0 hover:opacity-100 transition-opacity flex-col gap-2"
+                        >
+                          <span className="material-symbols-outlined text-4xl text-white">retweet</span>
+                          <span className="text-white font-bold text-sm">Retake Photo</span>
+                        </button>
+                      </div>
                     ) : (
-                      <div className="border-2 border-dashed border-primary/30 bg-primary-container/5 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 transition-colors hover:bg-primary-container/10 h-48 w-full">
+                      <button 
+                        onClick={startCamera}
+                        className="w-full border-2 border-dashed border-primary/30 bg-primary-container/5 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-3 transition-colors hover:bg-primary-container/10 h-48 active:scale-[0.98]"
+                      >
                         <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                           <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>photo_camera</span>
                         </div>
                         <div className="w-full">
-                          <span className="block text-slate-200 font-bold truncate">Capture Geo-tagged Photo</span>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-outline truncate block">Take a picture to auto-record location</span>
+                          <span className="block text-slate-200 font-bold truncate">Open Camera</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-outline truncate block">Live capture with embedded geo-tags</span>
                         </div>
-                      </div>
+                      </button>
                     )}
-                  </label>
+                  </div>
 
                   <div className="bg-surface-container-highest/30 p-4 rounded-xl flex items-center justify-between border border-white/5 w-full gap-2">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
