@@ -19,6 +19,7 @@ export default function WorkerDashboard() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [gps, setGps] = useState<{ lat: number; lon: number } | null>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsAddress, setGpsAddress] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'tasks' | 'submit' | 'profile'>('tasks');
   const [showCamera, setShowCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,6 +45,10 @@ export default function WorkerDashboard() {
         videoRef.current.srcObject = stream;
       }
       setShowCamera(true);
+      // Initiate GPS right when camera opens
+      if (!gps) {
+        captureGps();
+      }
     } catch (err) {
       toast.error('Could not access camera. Please allow permissions.');
       console.error('Camera error:', err);
@@ -67,6 +72,39 @@ export default function WorkerDashboard() {
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Draw the GPS Map Camera Watermark
+        const dateStr = new Date().toLocaleString();
+        const latStr = gps ? `Lat: ${gps.lat.toFixed(6)}` : 'Lat: Unknown';
+        const lonStr = gps ? `Lon: ${gps.lon.toFixed(6)}` : 'Lon: Unknown';
+        
+        const fontSize = Math.max(16, Math.floor(canvas.width / 35));
+        const padding = fontSize;
+        const lineHeight = fontSize * 1.4;
+        const boxHeight = gpsAddress ? (padding * 2 + lineHeight * 3) : (padding * 2 + lineHeight * 2);
+        
+        // Dark semi-transparent background at the bottom
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.fillRect(0, canvas.height - boxHeight, canvas.width, boxHeight);
+        
+        ctx.fillStyle = 'white';
+        let yPos = canvas.height - boxHeight + padding + fontSize;
+        
+        // Address line
+        if (gpsAddress) {
+           ctx.font = `bold ${fontSize}px sans-serif`;
+           ctx.fillText(gpsAddress.substring(0, 65) + (gpsAddress.length > 65 ? '...' : ''), padding, yPos);
+           yPos += lineHeight;
+        }
+        
+        // Lat/Lon line
+        ctx.font = `${fontSize * 0.9}px sans-serif`;
+        ctx.fillText(`${latStr}, ${lonStr}`, padding, yPos);
+        yPos += lineHeight;
+        
+        // Date line
+        ctx.fillText(dateStr, padding, yPos);
+        
         canvas.toBlob((blob) => {
           if (blob) {
             const file = new File([blob], `capture_${Date.now()}.jpg`, { type: 'image/jpeg' });
@@ -77,7 +115,7 @@ export default function WorkerDashboard() {
               captureGps();
             }
           }
-        }, 'image/jpeg', 0.8);
+        }, 'image/jpeg', 0.9);
       }
     }
   };
@@ -104,8 +142,22 @@ export default function WorkerDashboard() {
     if (!navigator.geolocation) { toast.error('Geolocation not supported'); return; }
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        setGps({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+      async pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setGps({ lat, lon });
+        
+        // Reverse geocoding for standard watermark implementation
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+          const data = await res.json();
+          if (data.display_name) {
+            setGpsAddress(data.display_name);
+          }
+        } catch (e) {
+          console.error('Reverse geocode failed', e);
+        }
+
         toast.success('Location captured!');
         setGpsLoading(false);
       },
@@ -314,22 +366,31 @@ export default function WorkerDashboard() {
                           muted 
                           className="w-full h-full object-cover"
                           onCanPlay={() => {
-                            // Ensure the video scales properly when ready
                             if (videoRef.current && streamRef.current) {
                               videoRef.current.play().catch(e => console.error("Video play error:", e));
                             }
                           }}
                         />
-                        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                        
+                        {/* Live Watermark Overlay (to preview what will be stamped) */}
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-3 text-white pointer-events-none z-10">
+                           {gpsAddress && <p className="text-xs font-bold truncate mb-1">{gpsAddress}</p>}
+                           <p className="text-[10px] text-white/90 font-mono">
+                             {gps ? `Lat: ${gps.lat.toFixed(6)}, Lon: ${gps.lon.toFixed(6)}` : (gpsLoading ? 'Locating GPS...' : 'GPS Not Available')}
+                           </p>
+                           <p className="text-[10px] text-white/90 font-mono mt-0.5">{new Date().toLocaleString()}</p>
+                        </div>
+                        
+                        <div className="absolute top-4 left-0 right-0 flex justify-center gap-4 z-20">
                           <button 
                             onClick={stopCamera}
-                            className="bg-surface/80 backdrop-blur text-foreground px-4 py-2 rounded-full font-bold text-xs"
+                            className="bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full font-bold text-xs border border-white/20"
                           >
                             Cancel
                           </button>
                           <button 
                             onClick={takePhoto}
-                            className="bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 border border-primary-foreground/20"
                           >
                             <span className="material-symbols-outlined text-sm">camera</span> Snap
                           </button>
