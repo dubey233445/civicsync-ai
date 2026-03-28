@@ -22,6 +22,7 @@ export default function WorkerDashboard() {
   const [gpsAddress, setGpsAddress] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'tasks' | 'submit' | 'profile'>('tasks');
   const [showCamera, setShowCamera] = useState(false);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -31,14 +32,20 @@ export default function WorkerDashboard() {
     };
   }, []);
 
-  const startCamera = async () => {
+  const startCamera = async (mode: 'environment' | 'user' = facingMode) => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         toast.error('Camera API not supported in this browser.');
         return;
       }
+      
+      // Stop previous stream if exists (for flipping)
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+        video: { facingMode: mode } 
       });
       streamRef.current = stream;
       setShowCamera(true);
@@ -66,6 +73,12 @@ export default function WorkerDashboard() {
       streamRef.current = null;
     }
     setShowCamera(false);
+  };
+
+  const flipCamera = () => {
+    const newMode = facingMode === 'environment' ? 'user' : 'environment';
+    setFacingMode(newMode);
+    startCamera(newMode);
   };
 
   const takePhoto = () => {
@@ -386,18 +399,25 @@ export default function WorkerDashboard() {
                            <p className="text-[10px] text-white/90 font-mono mt-0.5">{new Date().toLocaleString()}</p>
                         </div>
                         
-                        <div className="absolute top-4 left-0 right-0 flex justify-center gap-4 z-20">
+                        <div className="absolute top-4 left-0 right-0 flex justify-center items-center gap-3 z-20 px-4">
                           <button 
                             onClick={stopCamera}
-                            className="bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full font-bold text-xs border border-white/20"
+                            className="bg-black/50 backdrop-blur text-white px-4 py-2 rounded-full font-bold text-xs border border-white/20 mr-auto"
                           >
                             Cancel
                           </button>
                           <button 
                             onClick={takePhoto}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 border border-primary-foreground/20"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 border border-primary-foreground/20 absolute left-1/2 -translate-x-1/2"
                           >
                             <span className="material-symbols-outlined text-sm">camera</span> Snap
+                          </button>
+                          <button 
+                            onClick={flipCamera}
+                            className="w-10 h-10 bg-black/50 backdrop-blur text-white rounded-full flex items-center justify-center border border-white/20 ml-auto transition-transform active:rotate-180"
+                            title="Flip Camera"
+                          >
+                            <span className="material-symbols-outlined text-[20px]">cameraswitch</span>
                           </button>
                         </div>
                       </div>
