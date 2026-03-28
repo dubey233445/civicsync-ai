@@ -1,7 +1,7 @@
 // Standalone task creation page at /admin/tasks/new
 // Full form + click-to-place map picker + AI assignment panel
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTask } from '@/services/taskService';
@@ -15,7 +15,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Zap, Loader2, ChevronRight, MapPin, ClipboardList, MousePointerClick } from 'lucide-react';
+import { ArrowLeft, Zap, Loader2, ChevronRight, MapPin, ClipboardList, MousePointerClick, Search, Crosshair } from 'lucide-react';
+import { useDebounce } from '@/hooks/use-debounce'; // Assuming this exists, if not we will implement it or just use setTimeout
 import type { Database } from '@/integrations/supabase/types';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -25,6 +26,13 @@ interface WorkerScore {
   score: number;
   distanceKm: number;
   rank: number;
+}
+
+interface LocationSuggestion {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
 }
 
 const CATEGORIES = ['general', 'infrastructure', 'sanitation', 'safety', 'utilities', 'parks', 'roads'];
@@ -51,6 +59,64 @@ export default function TaskCreatePage() {
     queryKey: ['workers'],
     queryFn: fetchWorkers,
   });
+
+  const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debouncedLocationName = useDebounce(form.location_name, 500);
+
+  useEffect(() => {
+    if (!debouncedLocationName || debouncedLocationName.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    
+    const fetchSuggestions = async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(debouncedLocationName)}&limit=5`);
+        const data = await res.json();
+        setSuggestions(data);
+      } catch (err) {
+        console.error('Geocoding error:', err);
+      }
+    };
+    fetchSuggestions();
+  }, [debouncedLocationName]);
+
+  const handleSuggestionClick = (s: LocationSuggestion) => {
+    setForm(prev => ({
+      ...prev,
+      location_name: s.display_name,
+      latitude: parseFloat(s.lat).toFixed(6),
+      longitude: parseFloat(s.lon).toFixed(6)
+    }));
+    setShowSuggestions(false);
+    setAiScores([]);
+  };
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+    const toastId = toast.loading('Finding your location...');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        toast.dismiss(toastId);
+        toast.success('Location found');
+        setForm(prev => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6)
+        }));
+        setAiScores([]);
+      },
+      (err) => {
+        toast.dismiss(toastId);
+        toast.error('Unable to retrieve your location');
+      }
+    );
+  };
+
 
   // Called by LocationPicker when user clicks/drags on map
   const handleMapPick = useCallback(({ lat, lng }: { lat: number; lng: number }) => {
@@ -152,16 +218,35 @@ export default function TaskCreatePage() {
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 relative">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider">Location Name</Label>
             <div className="relative">
               <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input
-                value={form.location_name} onChange={f('location_name')}
+                value={form.location_name} 
+                onChange={(e) => {
+                  f('location_name')(e);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 placeholder="Oak Ave & 5th St"
                 className="pl-8 bg-surface-2 border-border focus:border-primary/50"
               />
             </div>
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-surface-1 border border-border rounded-md shadow-lg overflow-hidden">
+                {suggestions.map(s => (
+                  <div
+                    key={s.place_id}
+                    className="px-3 py-2 text-sm text-foreground hover:bg-surface-2 cursor-pointer border-b border-border last:border-0 truncate"
+                    onClick={() => handleSuggestionClick(s)}
+                  >
+                    {s.display_name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Coordinate read-outs (editable but also filled by map click) */}
@@ -256,6 +341,15 @@ export default function TaskCreatePage() {
                   {parsedLat.toFixed(4)}, {parsedLng.toFixed(4)}
                 </span>
               )}
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-6 w-6 ml-2 rounded-full border-border bg-surface-2 hover:bg-primary/20 hover:text-primary transition-colors disabled:opacity-50"
+                onClick={handleLocateMe}
+                title="Use current location"
+              >
+                <Crosshair className="w-3.5 h-3.5" />
+              </Button>
             </div>
             <LocationPicker
               lat={hasCoords ? parsedLat : undefined}
