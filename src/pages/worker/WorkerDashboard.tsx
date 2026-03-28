@@ -33,6 +33,10 @@ export default function WorkerDashboard() {
     if (!file) return;
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
+    // Automatically capture GPS location when a photo is taken
+    if (!gps) {
+      captureGps();
+    }
   };
 
   const captureGps = () => {
@@ -243,8 +247,8 @@ export default function WorkerDashboard() {
                           <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>photo_camera</span>
                         </div>
                         <div className="w-full">
-                          <span className="block text-slate-200 font-bold truncate">Upload Photo Proof</span>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-outline truncate block">Take a picture of the work</span>
+                          <span className="block text-slate-200 font-bold truncate">Capture Geo-tagged Photo</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-outline truncate block">Take a picture to auto-record location</span>
                         </div>
                       </div>
                     )}
