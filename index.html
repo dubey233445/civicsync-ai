@@ -1,28 +1,56 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <!-- Basic Setup -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Civicsync</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Civicsync" />
-    <meta property="og:description" content="Civicsync" />
+    <!-- App Title -->
+    <title>CivicSync | Smart Municipal Workflow System</title>
+
+    <!-- SEO Meta -->
+    <meta name="description" content="CivicSync is an AI-powered municipal workflow platform for Nagar Nigam to assign, track, and resolve civic issues efficiently." />
+    <meta name="keywords" content="CivicSync, Nagar Nigam, Smart City, Complaint Management, AI Governance, Municipal System" />
+    <meta name="author" content="CivicSync Team" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- Open Graph (for sharing) -->
+    <meta property="og:title" content="CivicSync - Smart Governance Platform" />
+    <meta property="og:description" content="Digitize municipal work assignment with AI-powered automation." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="png.png" />
+    <meta property="og:image" content="/preview.png" />
 
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Civicsync" />
-    <meta name="twitter:image" content="image.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <meta name="twitter:title" content="CivicSync" />
+    <meta name="twitter:description" content="AI-powered municipal workflow system" />
+    <meta name="twitter:image" content="/preview.png" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+    <!-- Theme Color (for mobile UI) -->
+    <meta name="theme-color" content="#0b1326" />
   </head>
 
-  <body class="bg-[#0b1326] text-[#dae2fd] antialiased overflow-x-hidden">
+  <body style="margin:0; font-family: 'Inter', sans-serif; background-color:#0b1326; color:#dae2fd;">
+    
+    <!-- No JS fallback -->
+    <noscript>
+      <div style="padding:20px; text-align:center;">
+        CivicSync requires JavaScript to run. Please enable JavaScript in your browser.
+      </div>
+    </noscript>
+
+    <!-- Root App -->
     <div id="root"></div>
+
+    <!-- Main App Script -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
